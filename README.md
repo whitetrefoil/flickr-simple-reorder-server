@@ -33,6 +33,7 @@ Links
 
 * Project Home - https://github.com/whitetrefoil/flickr-simple-reorder-server
 * Report Issue - https://github.com/whitetrefoil/flickr-simple-reorder-server/issues
+* The front-end - https://github.com/whitetrefoil/flickr-simple-reorder
 * Author's Flickr - https://www.flickr.com/whitetrefoil
 
 Changelog
