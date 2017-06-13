@@ -1,52 +1,38 @@
 'use strict'
 
-const crypto  = require('crypto')
-// const debug   = require('debug')('/routes/auth.js')
+const debug   = require('debug')
 const Router  = require('koa-router')
 const _       = require('lodash')
-const OAuth   = require('oauth-1.0a')
-const qs      = require('querystring')
-const request = require('superagent')
+
+const flickr = require('../helpers/flickr')
 
 const router = new Router()
 
-const oauth = OAuth({
-  // TODO
-  consumer        : {
-    key   : '5cdc0f5ec9c28202f1098f615edba5cd',
-    secret: 'e3b842e3b923b0fb',
-  },
-  // eslint-disable-next-line camelcase
-  signature_method: 'HMAC-SHA1',
-  // eslint-disable-next-line camelcase
-  hash_function   : (baseString, key) => {
-    return crypto.createHmac('sha1', key).update(baseString).digest('base64')
-  },
-})
 
-// region /loginToken
-
-router.get('/loginToken', async (ctx, next) => {
+async function getUserInfo(userId, token, secret) {
   const data = {
-    url   : 'https://www.flickr.com/services/oauth/request_token',
-    method: 'GET',
-    data  : {
-      // TODO
-      // eslint-disable-next-line camelcase
-      oauth_callback: 'http://localhost:8000/#/login',
-    },
+    // eslint-disable-next-line camelcase
+    user_id: userId,
   }
 
-  try {
-    const raw = await request(data.method, data.url)
-      .query(oauth.authorize(data, {}))
-    const res = qs.parse(raw.text)
-    ctx.body  = {
-      token : res.oauth_token,
-      secret: res.oauth_token_secret,
-    }
-  } catch (error) {
-    ctx.throw(error)
+  return await flickr.post('flickr.people.getInfo', data, token, secret)
+}
+
+
+// region GET /loginToken
+
+const debugGetLoginToken = debug('/routes/auth.js - GET /loginToken')
+router.get('/loginToken', async (ctx, next) => {
+  const gotLoginToken = await flickr.get('https://www.flickr.com/services/oauth/request_token', {
+    // TODO
+    // eslint-disable-next-line camelcase
+    oauth_callback: 'http://localhost:8000/#/login',
+  })
+  debugGetLoginToken(gotLoginToken)
+
+  ctx.body = {
+    token : gotLoginToken.oauth_token,
+    secret: gotLoginToken.oauth_token_secret,
   }
 
   await next()
@@ -54,39 +40,56 @@ router.get('/loginToken', async (ctx, next) => {
 
 // endregion
 
-// region /accessToken
+// region GET /accessToken
 
+const debugGetAccessToken = debug('/routes/auth.js - GET /accessToken')
 router.get('/accessToken', async (ctx, next) => {
   ctx.validateRequire(['token', 'secret', 'verifier'])
 
-  const data = {
-    url   : 'https://www.flickr.com/services/oauth/access_token',
-    method: 'GET',
-    data  : {
+  const gotAccessToken = await flickr.get(
+    'https://www.flickr.com/services/oauth/access_token',
+    {
       // eslint-disable-next-line camelcase
       oauth_verifier: ctx.request.mergedBody.verifier,
       // eslint-disable-next-line camelcase
       oauth_token   : ctx.request.mergedBody.token,
     },
+    ctx.request.mergedBody.token,
+    ctx.request.mergedBody.secret,
+  )
+  debugGetAccessToken(gotAccessToken)
+
+  const gotUserInfo = await getUserInfo(gotAccessToken.user_nsid, gotAccessToken.oauth_token, gotAccessToken.oauth_token_secret)
+
+  ctx.body = {
+    auth  : gotAccessToken,
+    person: gotUserInfo.person,
   }
 
-  const authorized = oauth.authorize(data, {
-    token : ctx.request.mergedBody.token,
-    secret: ctx.request.mergedBody.secret,
-  })
+  await next()
+})
 
-  try {
-    const raw = await request(data.method, data.url)
-      .query(authorized)
-    const res = qs.parse(raw.text)
-    ctx.body  = {
-      token   : res.oauth_token,
-      secret  : res.oauth_token_secret,
-      nsid    : res.user_nsid,
-      username: res.username,
-    }
-  } catch (error) {
-    ctx.throw(error)
+// endregion
+
+// region POST /checkToken
+
+const debugPostCheckToken = debug('/routes/auth.js - POST /checkToken')
+router.post('/checkToken', async (ctx, next) => {
+  ctx.validateRequire(['token', 'secret'])
+
+  const checkedToken = await flickr.post('flickr.auth.oauth.checkToken', {
+    // eslint-disable-next-line camelcase
+    oauth_token: ctx.request.mergedBody.token,
+  }, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
+
+  debugPostCheckToken('flickr.auth.oauth.checkToken:', checkedToken)
+  const nsid = _.get(checkedToken, 'oauth.user.nsid')
+  ctx.assert(nsid != null, 502, 'Flickr didn\'t response NSID.')
+
+  const userInfo = await getUserInfo(nsid, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
+  ctx.body       = {
+    oauth : checkedToken.oauth,
+    person: userInfo.person,
   }
 
   await next()
