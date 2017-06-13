@@ -133,6 +133,7 @@ local.properties
 .idea/**/sqlDataSources.xml
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
+.idea/**/dictionaries/
 
 # Gradle:
 .idea/**/gradle.xml
@@ -248,4 +249,3 @@ typings/
 test_results/
 ~*/
 dist/
-yarn.lock
