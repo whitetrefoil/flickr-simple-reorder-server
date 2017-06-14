@@ -24,8 +24,8 @@ const oauth = OAuth({
 })
 
 
-const debugGet = debug('/helpers/flickr.js - get()')
-async function get(url, data, token, secret) {
+const debugGetAuth = debug('/helpers/flickr.js - getAuth()')
+async function getAuth(url, data, token, secret) {
   const requestData = {
     url,
     method: 'GET',
@@ -38,9 +38,37 @@ async function get(url, data, token, secret) {
 
   const raw = await request('GET', url).query(authorized)
 
-  debugGet(raw)
+  debugGetAuth(raw)
 
   return qs.parse(raw.text)
+}
+
+
+const debugGet = debug('/helpers/flickr.js - get()')
+async function get(method, data, token, secret) {
+  const requestData = {
+    url   : 'https://api.flickr.com/services/rest/',
+    method: 'GET',
+    data  : _.defaults(data, {
+      method        : method,
+      format        : 'json',
+      nojsoncallback: '1',
+    }),
+  }
+
+  const authToken = token == null || secret == null ? {} : { token, secret }
+
+  const authorized = oauth.authorize(requestData, authToken)
+
+  const raw = await request(requestData.method, requestData.url)
+    .ok((res) => {
+      return res.status < 400 && _.get(res, 'body.stat') === 'ok'
+    })
+    .query(authorized)
+
+  debugGet(raw)
+
+  return format(raw.body)
 }
 
 
@@ -71,6 +99,7 @@ async function post(method, data, token, secret) {
 }
 
 module.exports = {
+  getAuth,
   get,
   post,
 }
