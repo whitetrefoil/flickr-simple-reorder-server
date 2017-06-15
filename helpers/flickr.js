@@ -38,7 +38,7 @@ async function getAuth(url, data, token, secret) {
 
   const raw = await request('GET', url).query(authorized)
 
-  debugGetAuth(raw)
+  debugGetAuth(raw.text)
 
   return qs.parse(raw.text)
 }
@@ -50,6 +50,8 @@ async function get(method, data, token, secret) {
     url   : 'https://api.flickr.com/services/rest/',
     method: 'GET',
     data  : _.defaults(data, {
+      // eslint-disable-next-line camelcase
+      oauth_token   : token,
       method        : method,
       format        : 'json',
       nojsoncallback: '1',
@@ -66,7 +68,7 @@ async function get(method, data, token, secret) {
     })
     .query(authorized)
 
-  debugGet(raw)
+  debugGet(raw.body)
 
   return format(raw.body)
 }
@@ -78,6 +80,8 @@ async function post(method, data, token, secret) {
     url   : 'https://api.flickr.com/services/rest/',
     method: 'POST',
     data  : _.defaults(data, {
+      // eslint-disable-next-line camelcase
+      oauth_token   : token,
       method        : method,
       format        : 'json',
       nojsoncallback: '1',
