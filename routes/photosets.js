@@ -82,10 +82,23 @@ router.post('/reorder', async (ctx, next) => {
   // debugPostPhotosetReorder(photos)
   debugPostPhotosetReorder(`Got ${photos.length} photos!`)
 
-  const sortedPhotoIds = _(photos)
-    .orderBy(ctx.request.mergedBody.orderBy, ctx.request.mergedBody.isDesc ? 'desc' : 'asc')
-    .map('id')
-    .join(',')
+  const sortedPhotos = _.orderBy(photos, ctx.request.mergedBody.orderBy, ctx.request.mergedBody.isDesc ? 'desc' : 'asc')
+
+  debugPostPhotosetReorder(`Original: ${photos}`)
+  debugPostPhotosetReorder(`Sorted: ${sortedPhotos}`)
+
+  if (_.isEqual(photos, sortedPhotos)) {
+    ctx.body = {
+      result: {
+        isSkipped   : true,
+        isSuccessful: true,
+      },
+    }
+    await next()
+    return
+  }
+
+  const sortedPhotoIds = _(sortedPhotos).map('id').join(',')
   debugPostPhotosetReorder(`New order: ${sortedPhotoIds}`)
 
   const reorderResult = await flickr.post(
@@ -103,7 +116,10 @@ router.post('/reorder', async (ctx, next) => {
   debugPostPhotosetReorder(reorderResult)
 
   ctx.body = {
-    reorderResult,
+    result: {
+      isSkipped   : false,
+      isSuccessful: true,
+    },
   }
 
   await next()
