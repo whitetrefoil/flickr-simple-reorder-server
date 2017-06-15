@@ -1,10 +1,10 @@
 'use strict'
 
-const debug  = require('debug')
 const Router = require('koa-router')
 const _      = require('lodash')
 
 const flickr = require('../helpers/flickr')
+const debug  = require('../helpers/log').debug
 
 const router = new Router()
 

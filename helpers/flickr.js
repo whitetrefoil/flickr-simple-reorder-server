@@ -1,12 +1,12 @@
 'use strict'
 
 const crypto  = require('crypto')
-const debug   = require('debug')
 const _       = require('lodash')
 const OAuth   = require('oauth-1.0a')
 const qs      = require('querystring')
 const request = require('superagent')
 const format  = require('./format-api')
+const debug   = require('./log').debug
 
 
 const oauth = OAuth({

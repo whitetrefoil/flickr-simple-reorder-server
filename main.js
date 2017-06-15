@@ -5,36 +5,17 @@ const _         = require('lodash')
 const app       = require('./server')
 const auth      = require('./routes/auth')
 const photosets = require('./routes/photosets')
+const config    = require('./helpers/config')
 
+app.use(require('./middlewares/response-body')())
 app.use(require('koa-logger')())
-// app.use(require('koa-helmet')())
-// app.use(require('koa-conditional-get')())
-// app.use(require('koa-etag')())
+app.use(require('koa-helmet')())
+app.use(require('koa-conditional-get')())
+app.use(require('koa-etag')())
 app.use(require('koa-bodyparser')())
-app.use(async (ctx, next) => {
-  ctx.request.mergedBody = _.assign({}, ctx.query, ctx.request.body)
-  await next()
-})
-app.use(require('./helpers/validate')())
-app.use(require('koa-json-error')(error => {
-  let devMessage
-
-  if (error.response != null) {
-    if (!_.isEmpty(error.response.error)) {
-      devMessage = error.response.error
-    } else if (!_.isEmpty(error.response.body)) {
-      devMessage = error.response.body
-    } else {
-      devMessage = error.response.text
-    }
-  } else {
-    devMessage = error.message || error
-  }
-  return {
-    status: error.status || 500,
-    devMessage,
-  }
-}))
+app.use(require('./middlewares/error-formatter')())
+app.use(require('./middlewares/request-body')())
+app.use(require('./middlewares/validate')())
 
 app.use(mount('/auth', auth.routes()))
 app.use(mount('/auth', auth.allowedMethods()))
