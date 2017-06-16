@@ -2,7 +2,7 @@
 
 require('chai').should()
 
-const format = require('../../helpers/format-api')
+const format = require('../../lib/helpers/format-api').default
 
 describe('Helpers', () => {
   describe(':: Format API', () => {

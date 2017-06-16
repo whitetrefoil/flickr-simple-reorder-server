@@ -250,3 +250,4 @@ test_results/
 ~*/
 dist/
 config.json
+lib/

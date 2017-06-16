@@ -1,10 +1,9 @@
-'use strict'
+import * as _ from 'lodash'
+import { Middleware } from 'koa'
 
-const _ = require('lodash')
-
-function validateFactory() {
+function validateFactory(): Middleware {
   return async (ctx, next) => {
-    ctx.validateRequire = (fields) => {
+    ctx.validateRequire = (fields: string[]) => {
       _.forEach(fields, (field) => {
         ctx.assert(!_.isNil(_.get(ctx.request.mergedBody, field)), 400, `"${field}" is required.`)
       })
@@ -14,4 +13,4 @@ function validateFactory() {
   }
 }
 
-module.exports = validateFactory
+export default validateFactory

@@ -147,7 +147,13 @@
     "prefer-template"                 : true,
     "quotemark"                       : [true, "single", "avoid-escape"],
     "semicolon"                       : [true, "never"],
-    "space-before-function-paren"     : [true, "never"],
+    "space-before-function-paren"     : [true, {
+      "anonymous"  : "never",
+      "named"      : "never",
+      "asyncArrow" : "always",
+      "method"     : "never",
+      "constructor": "never"
+    }],
     "variable-name"                   : [false, "check-format", "allow-leading-underscore"],
     "whitespace"                      : [
       true,

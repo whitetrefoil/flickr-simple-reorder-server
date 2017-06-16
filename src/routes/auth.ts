@@ -1,18 +1,14 @@
-'use strict'
-
-const Router = require('koa-router')
-const _      = require('lodash')
-
-const flickr = require('../helpers/flickr')
-const debug  = require('../helpers/log').debug
+import * as Router from 'koa-router'
+import * as _      from 'lodash'
+import config      from '../helpers/config'
+import * as flickr from '../helpers/flickr'
+import { debug }   from '../helpers/log'
 
 const router = new Router()
 
-
 const debugGetUserInfo = debug('/routes/auth.js - getUserInfo()')
-async function getUserInfo(userId, token, secret) {
+async function getUserInfo(userId: string, token: string, secret: string) {
   const data = {
-    // eslint-disable-next-line camelcase
     user_id: userId,
   }
 
@@ -30,9 +26,7 @@ async function getUserInfo(userId, token, secret) {
 const debugGetLoginToken = debug('/routes/auth.js - GET /loginToken')
 router.get('/loginToken', async (ctx, next) => {
   const gotLoginToken = await flickr.getAuth('https://www.flickr.com/services/oauth/request_token', {
-    // TODO
-    // eslint-disable-next-line camelcase
-    oauth_callback: 'http://localhost:8000/#/login',
+    oauth_callback: config.callback,
   })
   debugGetLoginToken(gotLoginToken)
 
@@ -55,14 +49,14 @@ router.get('/accessToken', async (ctx, next) => {
   ctx.validateRequire(['token', 'secret', 'verifier'])
 
   const gotAccessToken = await flickr.getAuth('https://www.flickr.com/services/oauth/access_token', {
-    // eslint-disable-next-line camelcase
     oauth_verifier: ctx.request.mergedBody.verifier,
-    // eslint-disable-next-line camelcase
     oauth_token   : ctx.request.mergedBody.token,
   }, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
   debugGetAccessToken(gotAccessToken)
 
-  const gotUserInfo = await getUserInfo(gotAccessToken.user_nsid, gotAccessToken.oauth_token, gotAccessToken.oauth_token_secret)
+  const gotUserInfo = await getUserInfo(gotAccessToken.user_nsid,
+    gotAccessToken.oauth_token,
+    gotAccessToken.oauth_token_secret)
 
   ctx.body = {
     token: {
@@ -84,12 +78,11 @@ router.post('/checkToken', async (ctx, next) => {
   ctx.validateRequire(['token', 'secret'])
 
   const checkedToken = await flickr.post('flickr.auth.oauth.checkToken', {
-    // eslint-disable-next-line camelcase
     oauth_token: ctx.request.mergedBody.token,
   }, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
 
   debugPostCheckToken('flickr.auth.oauth.checkToken:', checkedToken)
-  const nsid = _.get(checkedToken, 'oauth.user.nsid')
+  const nsid = _.get(checkedToken, 'oauth.user.nsid') as string
   ctx.assert(nsid != null, 502, 'Flickr didn\'t response NSID.')
 
   const userInfo = await getUserInfo(nsid, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
@@ -103,4 +96,4 @@ router.post('/checkToken', async (ctx, next) => {
 
 // endregion
 
-module.exports = router
+export default router

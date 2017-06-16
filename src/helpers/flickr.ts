@@ -19,7 +19,7 @@ const oauth = OAuth({
 
 
 const debugGetAuth = debug('/helpers/flickr.js - getAuth()')
-export async function getAuth(url: string, data: any, token: string, secret: string): Promise<any> {
+export async function getAuth(url: string, data: any, token?: string, secret?: string): Promise<any> {
   const requestData: OAuth.IRequest = {
     url,
     method: 'GET',
@@ -39,12 +39,11 @@ export async function getAuth(url: string, data: any, token: string, secret: str
 
 
 const debugGet = debug('/helpers/flickr.js - get()')
-export async function get(method: OAuth.IMethod, data: any, token: string, secret: string): Promise<any> {
+export async function get(method: string, data: any, token: string, secret: string): Promise<any> {
   const requestData: OAuth.IRequest = {
     url   : 'https://api.flickr.com/services/rest/',
     method: 'GET',
     data  : _.defaults(data, {
-      // eslint-disable-next-line camelcase
       oauth_token   : token,
       method,
       format        : 'json',
@@ -67,12 +66,11 @@ export async function get(method: OAuth.IMethod, data: any, token: string, secre
 
 
 const debugPost = debug('/helpers/flickr.js - post()')
-export async function post(method: OAuth.IMethod, data: any, token: string, secret: string) {
+export async function post(method: string, data: any, token: string, secret: string) {
   const requestData: OAuth.IRequest = {
     url   : 'https://api.flickr.com/services/rest/',
     method: 'POST',
     data  : _.defaults(data, {
-      // eslint-disable-next-line camelcase
       oauth_token   : token,
       method,
       format        : 'json',

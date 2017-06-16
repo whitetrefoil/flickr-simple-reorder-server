@@ -1,20 +1,16 @@
-'use strict'
-
-const Router = require('koa-router')
-const _      = require('lodash')
-
-const flickr = require('../helpers/flickr')
-const debug  = require('../helpers/log').debug
+import * as Router from 'koa-router'
+import * as _      from 'lodash'
+import config      from '../helpers/config'
+import * as flickr from '../helpers/flickr'
+import { debug }   from '../helpers/log'
 
 const router = new Router()
 
 
 const debugGetPhotos = debug('/routes/photosets.js - getPhotos()')
-async function getPhotos(nsid, setId, token, secret, page = 1) {
+async function getPhotos(nsid: string, setId: string, token: string, secret: string, page = 1): Promise<any[]> {
   const response = await flickr.get('flickr.photosets.getPhotos', {
-    // eslint-disable-next-line camelcase
     photoset_id: setId,
-    // eslint-disable-next-line camelcase
     user_id    : nsid,
     page,
     extras     : 'date_upload,date_taken,views',
@@ -36,22 +32,19 @@ router.get('/list', async (ctx, next) => {
   ctx.validateRequire(['nsid', 'token', 'secret'])
 
   const gotPhotosetList = await flickr.get(null, {
-    // eslint-disable-next-line camelcase
     user_id             : ctx.request.mergedBody.nsid,
-    // eslint-disable-next-line camelcase
     primary_photo_extras: 'url_m',
     method              : 'flickr.photosets.getList',
   }, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
   debugGetPhotosetList(gotPhotosetList)
 
-  const gotPhotosets        = _.get(gotPhotosetList, 'photosets.photoset')
-  const simplifiedPhotosets = _.map(gotPhotosets, photoset => {
-    return _.assign(
-      // eslint-disable-next-line camelcase
+  const gotPhotosets        = _.get(gotPhotosetList, 'photosets.photoset') as any[]
+  const simplifiedPhotosets = _.map(gotPhotosets, (photoset) =>
+    _.assign(
       { url_m: _.get(photoset, 'primary_photo_extras.url_m') },
       _.pick(photoset, ['id', 'photos', 'title']),
-    )
-  })
+    ),
+  )
 
   ctx.body = {
     photosets: simplifiedPhotosets,
@@ -104,9 +97,7 @@ router.post('/reorder', async (ctx, next) => {
   const reorderResult = await flickr.post(
     'flickr.photosets.reorderPhotos',
     {
-      // eslint-disable-next-line camelcase
       photoset_id: ctx.request.mergedBody.setId,
-      // eslint-disable-next-line camelcase
       photo_ids  : sortedPhotoIds,
     },
     ctx.request.mergedBody.token,
@@ -127,4 +118,4 @@ router.post('/reorder', async (ctx, next) => {
 
 // endregion
 
-module.exports = router
+export default router

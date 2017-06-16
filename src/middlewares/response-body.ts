@@ -1,8 +1,7 @@
-'use strict'
+import * as _         from 'lodash'
+import { Middleware } from 'koa'
 
-const _ = require('lodash')
-
-function responseBodyFactory() {
+function responseBodyFactory(): Middleware {
   return async (ctx, next) => {
     await next()
 
@@ -20,4 +19,4 @@ function responseBodyFactory() {
   }
 }
 
-module.exports = responseBodyFactory
+export default responseBodyFactory

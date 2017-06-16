@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "outDir"                        : "lib",
     "allowJs"                       : true,
     "allowSyntheticDefaultImports"  : true,
     "target"                        : "es2017",
@@ -17,8 +18,7 @@
     "suppressImplicitAnyIndexErrors": true
   },
   "include"        : [
-    "**/*.ts",
-    "*.ts"
+    "src/**/*.ts"
   ],
   "exclude"        : [
     "node_modules"

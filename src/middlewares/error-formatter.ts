@@ -1,12 +1,11 @@
-'use strict'
-
-const _        = require('lodash')
-const statuses = require('statuses')
-const log      = require('../helpers/log')
+import { Middleware } from 'koa'
+import * as _         from 'lodash'
+import * as statuses  from 'statuses'
+import * as log       from '../helpers/log'
 
 const debug = log.debug('/middlewares/error-formatter.js')
 
-function errorFormatterFactory() {
+function errorFormatterFactory(): Middleware {
   return async (ctx, next) => {
     try {
       await next()
@@ -39,4 +38,4 @@ function errorFormatterFactory() {
   }
 }
 
-module.exports = errorFormatterFactory
+export default errorFormatterFactory
