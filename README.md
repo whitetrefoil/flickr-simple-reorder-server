@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.1.1
+
+* Prefix all endpoints with `/api`.
+
 ### v0.1.0
 
 * Initial release.

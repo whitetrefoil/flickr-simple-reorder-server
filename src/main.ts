@@ -26,10 +26,10 @@ app.use(errorFormatter())
 app.use(requestBody())
 app.use(validate())
 
-app.use(mount('/auth', auth.routes()))
-app.use(mount('/auth', auth.allowedMethods()))
-app.use(mount('/photosets', photosets.routes()))
-app.use(mount('/photosets', photosets.allowedMethods()))
+app.use(mount('/api/auth', auth.routes()))
+app.use(mount('/api/auth', auth.allowedMethods()))
+app.use(mount('/api/photosets', photosets.routes()))
+app.use(mount('/api/photosets', photosets.allowedMethods()))
 
 app.listen(config.port, () => {
   log(`Server started at port ${config.port}`)
