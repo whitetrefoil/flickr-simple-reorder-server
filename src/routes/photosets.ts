@@ -1,11 +1,11 @@
 import * as Router from 'koa-router'
 import * as _      from 'lodash'
+import * as API    from '../api'
 import config      from '../helpers/config'
 import * as flickr from '../helpers/flickr'
 import { debug }   from '../helpers/log'
 
 const router = new Router()
-
 
 const debugGetPhotos = debug('/routes/photosets.js - getPhotos()')
 async function getPhotos(nsid: string, setId: string, token: string, secret: string, page = 1): Promise<any[]> {
@@ -31,24 +31,28 @@ const debugGetPhotosetList = debug('/routes/photosets.js - GET /list')
 router.get('/list', async (ctx, next) => {
   ctx.validateRequire(['nsid', 'token', 'secret'])
 
+  const body: API.IGetPhotosetListRequest = ctx.request.mergedBody
+
   const gotPhotosetList = await flickr.get(null, {
     user_id             : ctx.request.mergedBody.nsid,
     primary_photo_extras: 'url_m',
     method              : 'flickr.photosets.getList',
-  }, ctx.request.mergedBody.token, ctx.request.mergedBody.secret)
+  }, body.token, body.secret)
   debugGetPhotosetList(gotPhotosetList)
 
   const gotPhotosets        = _.get(gotPhotosetList, 'photosets.photoset') as any[]
-  const simplifiedPhotosets = _.map(gotPhotosets, (photoset) =>
-    _.assign(
-      { url_m: _.get(photoset, 'primary_photo_extras.url_m') },
-      _.pick(photoset, ['id', 'photos', 'title']),
-    ),
-  )
+  const simplifiedPhotosets = _.map(gotPhotosets, (photoset) => ({
+    url   : _.get(photoset, 'primary_photo_extras.url_m') as string,
+    id    : _.get(photoset, 'id') as string,
+    photos: _.get(photoset, 'photos') as number,
+    title : _.get(photoset, 'title') as string,
+  }))
 
-  ctx.body = {
+  const response: API.IGetPhotosetListResponse = {
     photosets: simplifiedPhotosets,
   }
+
+  ctx.body = response
 
   await next()
 })
@@ -60,10 +64,13 @@ router.get('/list', async (ctx, next) => {
 const debugPostPhotosetReorder = debug('/routes/photosets.js - POST /reorder')
 router.post('/reorder', async (ctx, next) => {
   ctx.validateRequire(['nsid', 'setId', 'orderBy', 'isDesc', 'token', 'secret'])
+
+  const body: API.IPostPhotosetReorderRequest = ctx.request.mergedBody
+
   ctx.assert(
-    _.includes(['datetaken', 'dateupload', 'title', 'views'], ctx.request.mergedBody.orderBy),
+    _.includes(['dateTaken', 'dateUpload', 'title', 'views'], body.orderBy),
     400,
-    '"orderBy" must be one of "datetaken", "dateupload", "title", "views"',
+    '"orderBy" must be one of "dateTaken", "dateUpload", "title", "views"',
   )
 
   const photos = await getPhotos(
@@ -72,21 +79,21 @@ router.post('/reorder', async (ctx, next) => {
     ctx.request.mergedBody.token,
     ctx.request.mergedBody.secret,
   )
-  // debugPostPhotosetReorder(photos)
   debugPostPhotosetReorder(`Got ${photos.length} photos!`)
 
-  const sortedPhotos = _.orderBy(photos, ctx.request.mergedBody.orderBy, ctx.request.mergedBody.isDesc ? 'desc' : 'asc')
+  const sortedPhotos = _.orderBy(photos, _.toLower(body.orderBy), body.isDesc ? 'desc' : 'asc')
 
   debugPostPhotosetReorder(`Original: ${photos}`)
   debugPostPhotosetReorder(`Sorted: ${sortedPhotos}`)
 
   if (_.isEqual(photos, sortedPhotos)) {
-    ctx.body = {
+    const response: API.IPostPhotosetReorderResponse = {
       result: {
         isSkipped   : true,
         isSuccessful: true,
       },
     }
+    ctx.body = response
     await next()
     return
   }
@@ -94,24 +101,19 @@ router.post('/reorder', async (ctx, next) => {
   const sortedPhotoIds = _(sortedPhotos).map('id').join(',')
   debugPostPhotosetReorder(`New order: ${sortedPhotoIds}`)
 
-  const reorderResult = await flickr.post(
-    'flickr.photosets.reorderPhotos',
-    {
-      photoset_id: ctx.request.mergedBody.setId,
-      photo_ids  : sortedPhotoIds,
-    },
-    ctx.request.mergedBody.token,
-    ctx.request.mergedBody.secret,
-  )
+  const reorderResult = await flickr.post('flickr.photosets.reorderPhotos', {
+    photoset_id: ctx.request.mergedBody.setId,
+    photo_ids  : sortedPhotoIds,
+  }, body.token, body.secret)
 
   debugPostPhotosetReorder(reorderResult)
-
-  ctx.body = {
+  const response: API.IPostPhotosetReorderResponse =  {
     result: {
       isSkipped   : false,
       isSuccessful: true,
     },
   }
+  ctx.body = response
 
   await next()
 })
