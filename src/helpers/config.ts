@@ -113,7 +113,7 @@ if (_.includes(AVAILABLE_ENV, process.env.NODE_ENV)) {
   config.env = process.env.NODE_ENV
 } else if (_.includes(AVAILABLE_ENV, cli.flags.env)) {
   config.env = cli.flags.env
-} else if (_.includes(AVAILABLE_ENV, configFromFile.logLevel)) {
+} else if (_.includes(AVAILABLE_ENV, configFromFile.env)) {
   config.env = configFromFile.env
 } else {
   config.env = DEFAULT_ENV
