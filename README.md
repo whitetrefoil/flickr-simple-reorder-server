@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.1.2
+
+* Fix bug about env read from config file.
+
 ### v0.1.1
 
 * Prefix all endpoints with `/api`.
