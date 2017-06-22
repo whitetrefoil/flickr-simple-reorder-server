@@ -79,10 +79,24 @@ export async function post(method: string, data: any, token: string, secret: str
   }
 
   const authorized = oauth.authorize(requestData, { token, secret })
+  debugPost(authorized)
 
   const raw = await request(requestData.method, requestData.url)
     .type('form')
-    .ok((res) => res.status < 400 && _.get(res, 'body.stat') === 'ok')
+    .ok((res) => {
+      const statusIsOk = res.status < 400
+      debugPost('Is status OK?:', statusIsOk)
+      if (!statusIsOk) { return false }
+
+      const flickrIsOk = _.get(res, 'body.stat') === 'ok'
+      debugPost('Is flickr OK?:', flickrIsOk)
+      if (!flickrIsOk) {
+        res.status = 400
+        return false
+      }
+
+      return true
+    })
     .send(authorized)
 
   debugPost(raw.body)

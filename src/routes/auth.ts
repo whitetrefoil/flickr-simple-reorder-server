@@ -95,7 +95,7 @@ router.post('/checkToken', async (ctx, next) => {
   const body: API.IPostCheckTokenRequest = ctx.request.mergedBody
 
   const checkedToken = await flickr.post('flickr.auth.oauth.checkToken', {
-    oauth_token: ctx.request.mergedBody.token,
+    oauth_token: body.token,
   }, body.token, body.secret)
 
   debugPostCheckToken('flickr.auth.oauth.checkToken:', checkedToken)
