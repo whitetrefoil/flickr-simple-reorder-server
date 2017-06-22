@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.1.4
+
+* Fix missing IPhotoset model.
+
 ### v0.1.3
 
 * Small tweaks.
