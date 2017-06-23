@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.1.5
+
+* Export photoset primary photo width & height.
+
 ### v0.1.4
 
 * Fix missing IPhotoset model.
