@@ -46,6 +46,8 @@ router.get('/list', async (ctx, next) => {
     id    : _.get(photoset, 'id') as string,
     photos: _.get(photoset, 'photos') as number,
     title : _.get(photoset, 'title') as string,
+    height: parseFloat(_.get(photoset, 'primary_photo_extras.height_m') as string),
+    width : parseFloat(_.get(photoset, 'primary_photo_extras.width_m') as string),
   }))
 
   const response: API.IGetPhotosetListResponse = {
