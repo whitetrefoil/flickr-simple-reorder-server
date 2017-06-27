@@ -85,9 +85,6 @@ router.post('/reorder', async (ctx, next) => {
 
   const sortedPhotos = _.orderBy(photos, _.toLower(body.orderBy), body.isDesc ? 'desc' : 'asc')
 
-  debugPostPhotosetReorder(`Original: ${photos}`)
-  debugPostPhotosetReorder(`Sorted: ${sortedPhotos}`)
-
   if (_.isEqual(photos, sortedPhotos)) {
     const response: API.IPostPhotosetReorderResponse = {
       result: {
