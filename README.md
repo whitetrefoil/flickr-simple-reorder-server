@@ -41,6 +41,10 @@ Changelog
 
 ### v0.1.5
 
+* Export reorder result.
+
+### v0.1.5
+
 * Export photoset primary photo width & height.
 
 ### v0.1.4

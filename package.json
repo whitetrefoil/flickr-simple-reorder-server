@@ -1,6 +1,6 @@
 {
   "name"           : "flickr-simple-reorder-server",
-  "version"        : "0.1.5",
+  "version"        : "0.1.6",
   "description"    : "A simple tool to help reorder photos in galleries.",
   "author"         : "WhiteTrefoil <whitetrefoil@gmail.com>",
   "main"           : "lib/main.js",
@@ -14,7 +14,8 @@
   },
   "license"        : "Apache-2.0",
   "engines"        : {
-    "node": ">=8.1.0"
+    "node": ">=8.1.2",
+    "npm" : ">=5.0.3"
   },
   "dependencies"   : {
     "@types/koa-bodyparser": "^3.0.23",
@@ -47,12 +48,12 @@
     "@types/koa"       : "^2.0.39",
     "@types/lodash"    : "^4.14.66",
     "@types/meow"      : "^3.6.2",
-    "@types/node"      : "^8.0.1",
+    "@types/node"      : "^8.0.3",
     "@types/superagent": "^3.5.0",
     "chai"             : "^4.0.2",
-    "eslint"           : "^4.0.0",
+    "eslint"           : "^4.1.1",
     "mocha"            : "^3.4.2",
-    "nyc"              : "^11.0.2",
+    "nyc"              : "^11.0.3",
     "rimraf"           : "^2.6.1",
     "tslint"           : "^5.4.3",
     "typescript"       : "^2.3.4"
