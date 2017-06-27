@@ -83,7 +83,7 @@ try {
   if (e.code === 'ENOENT') {
     console.log(`Config file not found. Generating example config file at "${configFileLocation}".`)
     try {
-      fs.copySync(path.join(__dirname, '../config.default.json'), configFileLocation)
+      fs.copySync(path.join(__dirname, '../../config.default.json'), configFileLocation)
       console.log('Done generating.  Please modify the config file then run again.  Exiting...')
       process.exit(1)
     } catch (e2) {

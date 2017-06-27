@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.1.10
+
+* Fix config file generation.
+
 ### v0.1.9
 
 * Add missing bin file.
