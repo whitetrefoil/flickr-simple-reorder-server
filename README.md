@@ -39,7 +39,11 @@ Links
 Changelog
 ---------
 
-### v0.1.5
+### v0.1.7
+
+* Lite some big logs.
+
+### v0.1.6
 
 * Export reorder result.
 
