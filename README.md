@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.1.9
+
+* Add missing bin file.
+
 ### v0.1.8
 
 * Better help message.
