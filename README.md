@@ -39,6 +39,12 @@ Links
 Changelog
 ---------
 
+### v0.1.8
+
+* Better help message.
+* Don't format "package.json" to be compatible with newest NPM standard.
+* Fix wrong version number in "package.json".
+
 ### v0.1.7
 
 * Lite some big logs.

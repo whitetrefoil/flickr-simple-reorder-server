@@ -30,6 +30,7 @@ const AVAILABLE_ENV: IEnv[]            = ['production', 'development']
 
 const cli = meow(`
   Options                                                     [${chalk.gray('default value')}]
+    -h, --help     Show this help message then exit
     -p, --port     Port of this server                        [${chalk.yellow('3000')}]
     -k, --key      Flickr API consumer key                    [${chalk.green('"a test key"')}]
     -s, --secret   Flickr API consumer key secret             [${chalk.green('"a test secret"')}]
@@ -55,6 +56,7 @@ const cli = meow(`
     EnvVars > Options > ConfigFile > Defaults
 `, {
   alias  : {
+    h: 'help',
     k: 'key',
     s: 'secret',
     b: 'callback',
