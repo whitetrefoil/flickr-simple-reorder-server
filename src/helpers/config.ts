@@ -112,7 +112,7 @@ if (_.includes(AVAILABLE_LOG_LEVEL, cli.flags.logLevel)) {
 }
 
 if (_.includes(AVAILABLE_ENV, process.env.NODE_ENV)) {
-  config.env = process.env.NODE_ENV
+  config.env = process.env.NODE_ENV as IEnv
 } else if (_.includes(AVAILABLE_ENV, cli.flags.env)) {
   config.env = cli.flags.env
 } else if (_.includes(AVAILABLE_ENV, configFromFile.env)) {

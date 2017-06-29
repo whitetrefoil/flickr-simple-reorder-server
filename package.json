@@ -49,17 +49,17 @@
     "@types/chalk": "^0.4.31",
     "@types/fs-extra": "^3.0.3",
     "@types/koa": "^2.0.39",
-    "@types/lodash": "^4.14.66",
+    "@types/lodash": "^4.14.67",
     "@types/meow": "^3.6.2",
-    "@types/node": "^8.0.3",
-    "@types/superagent": "^3.5.0",
+    "@types/node": "^8.0.4",
+    "@types/superagent": "^3.5.1",
     "chai": "^4.0.2",
     "eslint": "^4.1.1",
     "mocha": "^3.4.2",
     "nyc": "^11.0.3",
     "rimraf": "^2.6.1",
     "tslint": "^5.4.3",
-    "typescript": "^2.3.4"
+    "typescript": "^2.4.1"
   },
   "nyc": {
     "include": [
