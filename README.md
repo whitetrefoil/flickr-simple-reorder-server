@@ -39,6 +39,11 @@ Links
 Changelog
 ---------
 
+### v0.1.11
+
+* Update some dependencies.
+* Fix wrong version number in `package-lock.json`.
+
 ### v0.1.10
 
 * Fix config file generation.
