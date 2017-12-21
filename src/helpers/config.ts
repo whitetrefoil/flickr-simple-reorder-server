@@ -39,7 +39,7 @@ const DEFAULT_CALLBACK                 = 'http://localhost:8000/#/login'
 const DEFAULT_LOG_LEVEL: ILogLevel     = 'error'
 const DEFAULT_ENV: IEnv                = 'production'
 const AVAILABLE_LOG_LEVEL: ILogLevel[] = ['error', 'warning', 'log']
-const AVAILABLE_ENV: IEnv[]            = ['production', 'development']
+const AVAILABLE_ENV: IEnv[]            = ['production', 'testing', 'development']
 
 const { gray, green, yellow } = Chalk
 
@@ -135,5 +135,7 @@ if (_.includes(AVAILABLE_ENV, process.env.NODE_ENV)) {
 } else {
   config.env = DEFAULT_ENV
 }
+
+process.env.NODE_ENV = config.env
 
 export default config
