@@ -6,8 +6,8 @@ import * as _    from 'lodash'
 import * as meow from 'meow'
 import * as path from 'path'
 
-type ILogLevel = 'error'|'warning'|'log'
-type IEnv = 'development'|'testing'|'production'
+export type ILogLevel = 'error'|'warning'|'log'
+export type IEnv = 'development'|'testing'|'production'
 
 interface IFlags {
   help: boolean
@@ -21,7 +21,7 @@ interface IFlags {
   config: string
 }
 
-interface IConfig {
+export interface IConfig {
   port: number
   key: string
   secret: string

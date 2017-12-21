@@ -1,6 +1,6 @@
 import * as _ from 'lodash'
 
-interface IFlickrResponseContent {
+export interface IFlickrResponseContent {
   _content?: string|number
 
   [key: string]: string|number|IFlickrResponseContent

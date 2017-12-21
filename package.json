@@ -2,20 +2,31 @@
   "name": "@whitetrefoil/flickr-simple-reorder-server",
   "version": "0.2.0",
   "description": "A simple tool to help reorder photos in galleries.",
-  "author": "WhiteTrefoil <whitetrefoil@gmail.com>",
-  "main": "lib/main.js",
-  "homepage": "https://github.com/whitetrefoil/flickr-simple-reorder-server",
-  "repository": "https://github.com/whitetrefoil/flickr-simple-reorder-server.git",
-  "bugs": "https://github.com/whitetrefoil/flickr-simple-reorder-server/issues",
+  "main": "lib/common/main.js",
+  "module": "lib/esm/main.js",
+  "typings": "lib/types/main.d.ts",
   "bin": {
     "flickr-simple-reorder": "bin/flickr-simple-reorder"
   },
   "scripts": {
-    "build": "rimraf lib && tsc",
+    "prepublishOnly": "node scripts/prepublish-checklist.js && npm run build",
+    "build": "rimraf lib && tsc && tsc -p tsconfig.common.json",
     "test": "npm run build && mocha --recursive tests",
     "coverage": "npm run build && rimraf .nyc_output && nyc mocha --recursive tests"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whitetrefoil/flickr-simple-reorder-server.git"
+  },
+  "bugs": "https://github.com/whitetrefoil/flickr-simple-reorder-server/issues",
+  "homepage": "https://github.com/whitetrefoil/flickr-simple-reorder-server",
+  "author": "WhiteTrefoil <whitetrefoil@gmail.com>",
   "license": "Apache-2.0",
+  "files": [
+    "lib/**/*.js",
+    "lib/types/**/*.d.ts",
+    "README.md"
+  ],
   "engines": {
     "node": ">=8.9.3"
   },
