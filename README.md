@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.2.0
+
+* Add a new "bulk_reorder" API.
+
 ### v0.1.11
 
 * Update some dependencies.
