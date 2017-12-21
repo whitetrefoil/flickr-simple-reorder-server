@@ -14,11 +14,14 @@ const oauth = OAuth({
     secret: config.secret,
   },
   signature_method: 'HMAC-SHA1',
-  hash_function   : (baseString, key) => crypto.createHmac('sha1', key).update(baseString).digest('base64'),
+  hash_function   : (baseString, key) => crypto.createHmac('sha1', key)
+    .update(baseString)
+    .digest('base64'),
 })
 
 
 const debugGetAuth = debug('/helpers/flickr.js - getAuth()').debug
+
 export async function getAuth(url: string, data: any, token?: string, secret?: string): Promise<any> {
   const requestData: OAuth.IRequest = {
     url,
@@ -30,7 +33,8 @@ export async function getAuth(url: string, data: any, token?: string, secret?: s
 
   const authorized = oauth.authorize(requestData, authToken)
 
-  const raw = await request('GET', url).query(authorized)
+  const raw = await request('GET', url)
+    .query(authorized)
 
   debugGetAuth(raw.text)
 
@@ -39,6 +43,7 @@ export async function getAuth(url: string, data: any, token?: string, secret?: s
 
 
 const debugGet = debug('/helpers/flickr.js - get()').debug
+
 export async function get(method: string, data: any, token: string, secret: string): Promise<any> {
   const requestData: OAuth.IRequest = {
     url   : 'https://api.flickr.com/services/rest/',
@@ -66,6 +71,7 @@ export async function get(method: string, data: any, token: string, secret: stri
 
 
 const debugPost = debug('/helpers/flickr.js - post()').debug
+
 export async function post(method: string, data: any, token: string, secret: string) {
   const requestData: OAuth.IRequest = {
     url   : 'https://api.flickr.com/services/rest/',

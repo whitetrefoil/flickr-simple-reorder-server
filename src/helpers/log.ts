@@ -1,9 +1,9 @@
 /* tslint:disable:no-console */
 
+import { getLogger, setFilter } from '@whitetrefoil/debug-log'
 import * as _                   from 'lodash'
 import * as timestamp           from 'time-stamp'
 import config                   from './config'
-import { getLogger, setFilter } from '@whitetrefoil/debug-log'
 
 if (_.isEmpty(process.env.DEBUG)) { setFilter('/') }
 

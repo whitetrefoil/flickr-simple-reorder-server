@@ -6,7 +6,7 @@ import * as log       from '../helpers/log'
 const { debug } = log.debug('/middlewares/error-formatter.js')
 
 function errorFormatterFactory(): Middleware {
-  return async (ctx, next) => {
+  return async(ctx, next) => {
     try {
       await next()
     } catch (error) {

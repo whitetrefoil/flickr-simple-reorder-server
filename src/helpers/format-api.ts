@@ -1,8 +1,9 @@
 import * as _ from 'lodash'
 
 interface IFlickrResponseContent {
-  [key: string]: string | number | IFlickrResponseContent
-  _content?: string | number
+  _content?: string|number
+
+  [key: string]: string|number|IFlickrResponseContent
 }
 
 function formatFlickrApi(obj: IFlickrResponseContent): any {
