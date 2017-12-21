@@ -1,6 +1,6 @@
 {
   "name": "@whitetrefoil/flickr-simple-reorder-server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A simple tool to help reorder photos in galleries.",
   "main": "lib/common/main.js",
   "module": "lib/esm/main.js",
