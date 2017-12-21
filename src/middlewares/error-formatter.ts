@@ -3,7 +3,7 @@ import * as _         from 'lodash'
 import * as statuses  from 'statuses'
 import * as log       from '../helpers/log'
 
-const debug = log.debug('/middlewares/error-formatter.js')
+const { debug } = log.debug('/middlewares/error-formatter.js')
 
 function errorFormatterFactory(): Middleware {
   return async (ctx, next) => {

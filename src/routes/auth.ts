@@ -7,7 +7,7 @@ import { debug }   from '../helpers/log'
 
 const router = new Router()
 
-const debugGetUserInfo = debug('/routes/auth.js - getUserInfo()')
+const debugGetUserInfo = debug('/routes/auth.js - getUserInfo()').debug
 async function getUserInfo(userId: string, token: string, secret: string): Promise<API.IUser> {
   const data = {
     user_id: userId,
@@ -30,7 +30,7 @@ async function getUserInfo(userId: string, token: string, secret: string): Promi
 
 // region GET /loginToken
 
-const debugGetLoginToken = debug('/routes/auth.js - GET /loginToken')
+const debugGetLoginToken = debug('/routes/auth.js - GET /loginToken').debug
 router.get('/loginToken', async (ctx, next) => {
   const gotLoginToken = await flickr.getAuth('https://www.flickr.com/services/oauth/request_token', {
     oauth_callback: config.callback,
@@ -53,7 +53,7 @@ router.get('/loginToken', async (ctx, next) => {
 
 // region GET /accessToken
 
-const debugGetAccessToken = debug('/routes/auth.js - GET /accessToken')
+const debugGetAccessToken = debug('/routes/auth.js - GET /accessToken').debug
 router.get('/accessToken', async (ctx, next) => {
   ctx.validateRequire(['token', 'secret', 'verifier'])
 
@@ -88,7 +88,7 @@ router.get('/accessToken', async (ctx, next) => {
 
 // region POST /checkToken
 
-const debugPostCheckToken = debug('/routes/auth.js - POST /checkToken')
+const debugPostCheckToken = debug('/routes/auth.js - POST /checkToken').debug
 router.post('/checkToken', async (ctx, next) => {
   ctx.validateRequire(['token', 'secret'])
 

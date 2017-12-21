@@ -7,7 +7,7 @@ import { debug }   from '../helpers/log'
 
 const router = new Router()
 
-const debugGetPhotos = debug('/routes/photosets.js - getPhotos()')
+const debugGetPhotos = debug('/routes/photosets.js - getPhotos()').debug
 async function getPhotos(nsid: string, setId: string, token: string, secret: string, page = 1): Promise<any[]> {
   const response = await flickr.get('flickr.photosets.getPhotos', {
     photoset_id: setId,
@@ -27,7 +27,7 @@ async function getPhotos(nsid: string, setId: string, token: string, secret: str
 // region GET /list
 
 // TODO: Assume there's only one page of photosets
-const debugGetPhotosetList = debug('/routes/photosets.js - GET /list')
+const debugGetPhotosetList = debug('/routes/photosets.js - GET /list').debug
 router.get('/list', async (ctx, next) => {
   ctx.validateRequire(['nsid', 'token', 'secret'])
 
@@ -63,7 +63,7 @@ router.get('/list', async (ctx, next) => {
 
 // region POST /reorder
 
-const debugPostPhotosetReorder = debug('/routes/photosets.js - POST /reorder')
+const debugPostPhotosetReorder = debug('/routes/photosets.js - POST /reorder').debug
 router.post('/reorder', async (ctx, next) => {
   ctx.validateRequire(['nsid', 'setId', 'orderBy', 'isDesc', 'token', 'secret'])
 
@@ -86,13 +86,13 @@ router.post('/reorder', async (ctx, next) => {
   const sortedPhotos = _.orderBy(photos, _.toLower(body.orderBy), body.isDesc ? 'desc' : 'asc')
 
   if (_.isEqual(photos, sortedPhotos)) {
-    const response: API.IPostPhotosetReorderResponse = {
+    const equalRes: API.IPostPhotosetReorderResponse = {
       result: {
         isSkipped   : true,
         isSuccessful: true,
       },
     }
-    ctx.body = response
+    ctx.body = equalRes
     await next()
     return
   }

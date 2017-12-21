@@ -1,13 +1,25 @@
 /* tslint:disable:no-console */
 
-import * as chalk from 'chalk'
-import * as fs    from 'fs-extra'
-import * as _     from 'lodash'
-import * as meow  from 'meow'
-import * as path  from 'path'
+import Chalk     from 'chalk'
+import * as fs   from 'fs-extra'
+import * as _    from 'lodash'
+import * as meow from 'meow'
+import * as path from 'path'
 
-type ILogLevel = 'error' | 'warning' | 'log'
-type IEnv = 'development' | 'production'
+type ILogLevel = 'error'|'warning'|'log'
+type IEnv = 'development'|'testing'|'production'
+
+interface IFlags {
+  help: boolean
+  version: boolean
+  port: number
+  key: string
+  secret: string
+  callback: string
+  logLevel: string
+  dev: boolean
+  config: string
+}
 
 interface IConfig {
   port: number
@@ -16,6 +28,7 @@ interface IConfig {
   callback: string
   logLevel: ILogLevel
   env: IEnv
+
   isDev(): boolean
 }
 
@@ -28,49 +41,51 @@ const DEFAULT_ENV: IEnv                = 'production'
 const AVAILABLE_LOG_LEVEL: ILogLevel[] = ['error', 'warning', 'log']
 const AVAILABLE_ENV: IEnv[]            = ['production', 'development']
 
-const cli = meow(`
-  Options                                                     [${chalk.gray('default value')}]
+const { gray, green, yellow } = Chalk
+
+const cli = meow<IFlags>(
+  `
+  Options                                                     [${gray('default value')}]
     -h, --help     Show this help message then exit
-    -p, --port     Port of this server                        [${chalk.yellow('3000')}]
-    -k, --key      Flickr API consumer key                    [${chalk.green('"a test key"')}]
-    -s, --secret   Flickr API consumer key secret             [${chalk.green('"a test secret"')}]
+    -v, --version  Show version number
+    -p, --port     Port of this server                        [${yellow('3000')}]
+    -k, --key      Flickr API consumer key                    [${green('"a test key"')}]
+    -s, --secret   Flickr API consumer key secret             [${green('"a test secret"')}]
                    The test key will redirect to
                    http://localhost:3000
-    -b, --callback The URL Flickr login page will redirect to [${chalk.green('"a test URL"')}]
-    -l, --logLevel The lowest level to log                    [${chalk.green('"error"')}]
+    -b, --callback The URL Flickr login page will redirect to [${green('"a test URL"')}]
+    -l, --logLevel The lowest level to log                    [${green('"error"')}]
                    Can be: "error", "warning", "log"
-    -d, --dev      Set environment to "development"           [${chalk.yellow('false')}]
-    -c, --config   Specify the location of config file        [${chalk.green('"config.json"')}]
+    -d, --dev      Set environment to "development"           [${yellow('false')}]
+    -c, --config   Specify the location of config file        [${green('"config.json"')}]
                    If the file isn't existing,
                    it will create a template
 
   Environment variables
-    NODE_ENV       The running environment                    [${chalk.green('"production"')}]
+    NODE_ENV       The running environment                    [${green('"production"')}]
                    will override "-d" option
                    Can be: "development", "production"
-    DEBUG          Print debug info                           [${chalk.green('""')}]
+    DEBUG          Print debug info                           [${green('""')}]
                    Set to "*" to show all
                    https://github.com/visionmedia/debug
 
   Priority
     EnvVars > Options > ConfigFile > Defaults
-`, {
-  alias  : {
-    h: 'help',
-    k: 'key',
-    s: 'secret',
-    b: 'callback',
-    l: 'logLevel',
-    d: 'dev',
-    c: 'config',
+`,
+  {
+    flags: {
+      help    : { alias: 'h', type: 'boolean' },
+      version : { alias: 'v', type: 'boolean' },
+      port    : { alias: 'p' },
+      key     : { alias: 'k', type: 'string' },
+      secret  : { alias: 's', type: 'string' },
+      callback: { alias: 'b', type: 'string' },
+      logLevel: { alias: 'l', type: 'string' },
+      dev     : { alias: 'd', default: false, type: 'boolean' },
+      config  : { alias: 'c', default: 'config.json', type: 'string' },
+    },
   },
-  string : ['key', 'secret', 'callback', 'logLevel', 'config'],
-  boolean: ['dev'],
-  default: {
-    d: false,
-    c: 'config.json',
-  },
-})
+)
 
 const configFileLocation = path.resolve(cli.flags.config)
 
@@ -113,8 +128,8 @@ if (_.includes(AVAILABLE_LOG_LEVEL, cli.flags.logLevel)) {
 
 if (_.includes(AVAILABLE_ENV, process.env.NODE_ENV)) {
   config.env = process.env.NODE_ENV as IEnv
-} else if (_.includes(AVAILABLE_ENV, cli.flags.env)) {
-  config.env = cli.flags.env
+} else if (cli.flags.dev) {
+  config.env = 'development'
 } else if (_.includes(AVAILABLE_ENV, configFromFile.env)) {
   config.env = configFromFile.env
 } else {

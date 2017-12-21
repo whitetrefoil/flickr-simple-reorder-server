@@ -1,8 +1,13 @@
 /* tslint:disable:no-console */
 
-import * as _         from 'lodash'
-import * as timestamp from 'time-stamp'
-import config         from './config'
+import * as _                   from 'lodash'
+import * as timestamp           from 'time-stamp'
+import config                   from './config'
+import { getLogger, setFilter } from '@whitetrefoil/debug-log'
+
+if (_.isEmpty(process.env.DEBUG)) { setFilter('/') }
+
+export const debug = getLogger
 
 function datetime(): string {
   return timestamp('YYYY-MM-DD HH:mm:ss.ms')
@@ -20,9 +25,4 @@ export function warn(...args: any[]): void {
 
 export function error(...args: any[]): void {
   console.error(datetime(), '- ERR -', ...args)
-}
-
-export function debug(name: string): Function {
-  if (!config.isDev() || _.isEmpty(process.env.DEBUG)) { return _.noop }
-  return require('debug')(name)
 }

@@ -250,3 +250,5 @@ test_results/
 ~*/
 dist/
 config.json
+.idea/misc.xml
+lib/

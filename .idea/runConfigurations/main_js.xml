@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.js" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" path-to-js-file="lib/main.js" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="main.js" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="$PROJECT_DIR$/../../DWZQ/Redirect_Page/redirect-page-2/node_modules/ts-node/dist/bin.js" node-parameters="-P tsconfig.json" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
     <envs>
       <env name="DEBUG" value="*" />
     </envs>
