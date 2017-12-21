@@ -1,13 +1,14 @@
-import * as Router from 'koa-router'
-import * as _      from 'lodash'
-import * as API    from '../api'
-import config      from '../helpers/config'
-import * as flickr from '../helpers/flickr'
-import { debug }   from '../helpers/log'
+import * as Router  from 'koa-router'
+import * as _       from 'lodash'
+import * as through from 'through'
+import * as API     from '../api'
+import * as flickr  from '../helpers/flickr'
+import { debug }    from '../helpers/log'
 
 const router = new Router()
 
 const debugGetPhotos = debug('/routes/photosets.js - getPhotos()').debug
+
 async function getPhotos(nsid: string, setId: string, token: string, secret: string, page = 1): Promise<any[]> {
   const response = await flickr.get('flickr.photosets.getPhotos', {
     photoset_id: setId,
@@ -24,11 +25,56 @@ async function getPhotos(nsid: string, setId: string, token: string, secret: str
   return response.photoset.photo.concat(await getPhotos(nsid, setId, token, secret, page + 1))
 }
 
+async function reorderPhotoset(
+  nsid: string,
+  setId: string,
+  orderBy: string,
+  isDesc: boolean,
+  token: string,
+  secret: string,
+  logger: Function,
+): Promise<API.IPostPhotosetReorderResponse> {
+  const photos = await getPhotos(nsid, setId, token, secret)
+  logger(`Got ${photos.length} photos!`)
+
+  const sortedPhotos = _.orderBy(photos, _.toLower(orderBy), isDesc ? 'desc' : 'asc')
+
+  if (_.isEqual(photos, sortedPhotos)) {
+    const equalRes: API.IPostPhotosetReorderResponse = {
+      result: {
+        isSkipped   : true,
+        isSuccessful: true,
+      },
+    }
+
+    return equalRes
+  }
+
+  const sortedPhotoIds = _(sortedPhotos)
+    .map('id')
+    .join(',')
+
+  logger(`New order: ${sortedPhotoIds}`)
+
+  const reorderResult = await flickr.post('flickr.photosets.reorderPhotos', {
+    photoset_id: setId,
+    photo_ids  : sortedPhotoIds,
+  }, token, secret)
+
+  logger(reorderResult)
+  return {
+    result: {
+      isSkipped   : false,
+      isSuccessful: true,
+    },
+  }
+}
+
 // region GET /list
 
 // TODO: Assume there's only one page of photosets
 const debugGetPhotosetList = debug('/routes/photosets.js - GET /list').debug
-router.get('/list', async (ctx, next) => {
+router.get('/list', async(ctx, next) => {
   ctx.validateRequire(['nsid', 'token', 'secret'])
 
   const body: API.IGetPhotosetListRequest = ctx.request.mergedBody
@@ -64,7 +110,7 @@ router.get('/list', async (ctx, next) => {
 // region POST /reorder
 
 const debugPostPhotosetReorder = debug('/routes/photosets.js - POST /reorder').debug
-router.post('/reorder', async (ctx, next) => {
+router.post('/reorder', async(ctx, next) => {
   ctx.validateRequire(['nsid', 'setId', 'orderBy', 'isDesc', 'token', 'secret'])
 
   const body: API.IPostPhotosetReorderRequest = ctx.request.mergedBody
@@ -75,48 +121,78 @@ router.post('/reorder', async (ctx, next) => {
     '"orderBy" must be one of "dateTaken", "dateUpload", "title", "views"',
   )
 
-  const photos = await getPhotos(
-    ctx.request.mergedBody.nsid,
-    ctx.request.mergedBody.setId,
-    ctx.request.mergedBody.token,
-    ctx.request.mergedBody.secret,
+  const response = await reorderPhotoset(
+    body.nsid,
+    body.setId,
+    body.orderBy,
+    body.isDesc,
+    body.token,
+    body.secret,
+    debugPostPhotosetReorder,
   )
-  debugPostPhotosetReorder(`Got ${photos.length} photos!`)
 
-  const sortedPhotos = _.orderBy(photos, _.toLower(body.orderBy), body.isDesc ? 'desc' : 'asc')
-
-  if (_.isEqual(photos, sortedPhotos)) {
-    const equalRes: API.IPostPhotosetReorderResponse = {
-      result: {
-        isSkipped   : true,
-        isSuccessful: true,
-      },
-    }
-    ctx.body = equalRes
-    await next()
-    return
-  }
-
-  const sortedPhotoIds = _(sortedPhotos).map('id').join(',')
-  debugPostPhotosetReorder(`New order: ${sortedPhotoIds}`)
-
-  const reorderResult = await flickr.post('flickr.photosets.reorderPhotos', {
-    photoset_id: ctx.request.mergedBody.setId,
-    photo_ids  : sortedPhotoIds,
-  }, body.token, body.secret)
-
-  debugPostPhotosetReorder(reorderResult)
-  const response: API.IPostPhotosetReorderResponse =  {
-    result: {
-      isSkipped   : false,
-      isSuccessful: true,
-    },
-  }
   ctx.body = response
 
   await next()
 })
 
 // endregion
+
+const debugPostPhotosetBulkReorder = debug('/routes/photosets.js - POST /bulk_reorder').debug
+
+router.post('/bulk_reorder', (ctx, next) => {
+  ctx.validateRequire(['nsid', 'setIds', 'orderBy', 'isDesc', 'token', 'secret'])
+
+  const body: API.IPostPhotosetBulkReorderRequest = ctx.request.mergedBody
+
+  ctx.assert(
+    _.includes(['dateTaken', 'dateUpload', 'title', 'views'], body.orderBy),
+    400,
+    '"orderBy" must be one of "dateTaken", "dateUpload", "title", "views"',
+  )
+
+  const stream = through()
+  ctx.body     = stream
+
+  Promise.all(_.map(body.setIds, (setId) => {
+    let flag: string
+
+    debugPostPhotosetBulkReorder(`Reordering: ${setId}`)
+
+    return reorderPhotoset(
+      body.nsid,
+      setId,
+      body.orderBy,
+      body.isDesc,
+      body.token,
+      body.secret,
+      debugPostPhotosetBulkReorder,
+    )
+      .then((result) => {
+        switch (true) {
+          case result.result.isSkipped:
+            debugPostPhotosetBulkReorder(`${setId} is skipped`)
+            flag = 'k'
+            break
+          case result.result.isSuccessful:
+            debugPostPhotosetBulkReorder(`${setId} is successful`)
+            flag = 's'
+            break
+          default:
+            debugPostPhotosetBulkReorder(`${setId} is failed`)
+            flag = 'f'
+        }
+        stream.write(`${setId}:${flag},`)
+      }, (e) => {
+        debugPostPhotosetBulkReorder(`${setId} is failed by exception:\n${e.stack}`)
+        flag = 'f'
+        stream.write(`${setId}:${flag},`)
+      })
+  }))
+    .then(() => {
+      stream.end()
+      debugPostPhotosetBulkReorder(`Done bulk reordering`)
+    })
+})
 
 export default router
