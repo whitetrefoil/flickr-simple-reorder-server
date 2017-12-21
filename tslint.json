@@ -147,13 +147,7 @@
     "prefer-template"                 : true,
     "quotemark"                       : [true, "single", "avoid-escape"],
     "semicolon"                       : [true, "never"],
-    "space-before-function-paren"     : [true, {
-      "anonymous"  : "never",
-      "named"      : "never",
-      "asyncArrow" : "always",
-      "method"     : "never",
-      "constructor": "never"
-    }],
+    "space-before-function-paren"     : [true, "never"],
     "variable-name"                   : [false, "check-format", "allow-leading-underscore"],
     "whitespace"                      : [
       true,
@@ -180,6 +174,21 @@
     // v5.4.0 Updates
     "switch-final-break"              : true,
     "use-default-type-parameter"      : false,
-    "binary-expression-operand-order" : true
+    "binary-expression-operand-order" : true,
+    // v5.5.0 Updates
+    "no-this-assignment"              : true,
+    // v5.6.0 Updates
+    "no-duplicate-imports"            : true,
+    "no-submodule-imports"            : false,
+    "space-within-parens"             : false,
+    // v5.7.0 Updates
+    "no-parameter-reassignment"       : true,
+    // v5.8.0 Updates
+    "no-return-await"                 : true,
+    "no-redundant-jsdoc"              : true,
+    "no-duplicate-switch-case"        : true,
+    "no-implicit-dependencies"        : true,
+    "no-unnecessary-class"            : true,
+    "ban-comma-operator"              : true
   }
 }

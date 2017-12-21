@@ -1,5 +1,5 @@
 {
-  "name": "flickr-simple-reorder-server",
+  "name": "@whitetrefoil/flickr-simple-reorder-server",
   "version": "0.2.0",
   "description": "A simple tool to help reorder photos in galleries.",
   "author": "WhiteTrefoil <whitetrefoil@gmail.com>",
@@ -12,8 +12,8 @@
   },
   "scripts": {
     "build": "rimraf lib && tsc",
-    "test": "mocha --recursive tests",
-    "coverage": "rimraf .nyc_output && nyc mocha --recursive tests"
+    "test": "npm run build && mocha --recursive tests",
+    "coverage": "npm run build && rimraf .nyc_output && nyc mocha --recursive tests"
   },
   "license": "Apache-2.0",
   "engines": {
@@ -42,6 +42,7 @@
     "oauth-1.0a": "^2.2.3",
     "statuses": "^1.4.0",
     "superagent": "^3.8.2",
+    "through": "^2.3.8",
     "time-stamp": "^2.0.0"
   },
   "devDependencies": {
@@ -51,6 +52,7 @@
     "@types/meow": "^3.6.2",
     "@types/node": "^8.5.1",
     "@types/superagent": "^3.5.6",
+    "@types/through": "0.0.29",
     "chai": "^4.1.2",
     "mocha": "^4.0.1",
     "nyc": "^11.4.1",
