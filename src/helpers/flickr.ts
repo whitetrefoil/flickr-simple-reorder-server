@@ -59,7 +59,7 @@ export async function get(method: string, data: any, token: string, secret: stri
     .ok((res) => res.status < 400 && _.get(res, 'body.stat') === 'ok')
     .query(authorized)
 
-  debugGet(raw.body)
+  // debugGet(raw.body)
 
   return format(raw.body)
 }
