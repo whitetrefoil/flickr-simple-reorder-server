@@ -152,7 +152,8 @@ router.post('/bulk_reorder', (ctx, next) => {
   )
 
   const stream = through()
-  ctx.body     = stream
+  ctx.set({ 'X-Accel-Buffering': 'no' })
+  ctx.body = stream
 
   Promise.all(_.map(body.setIds, (setId) => {
     let flag: string
