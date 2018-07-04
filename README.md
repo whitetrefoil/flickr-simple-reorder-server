@@ -39,6 +39,10 @@ Links
 Changelog
 ---------
 
+### v0.2.4
+
+* Export API types.
+
 ### v0.2.3
 
 * Set response header `X-Accel-Buffering: no` to disable nginx proxy buffer.
