@@ -33,3 +33,5 @@ app.use(mount('/api/photosets', photosets.allowedMethods()))
 app.listen(config.port, () => {
   log(`Server started at port ${config.port}`)
 })
+
+export * from './api'
