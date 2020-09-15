@@ -1,4 +1,4 @@
-import { IOrderByOption } from './order-by-option'
+import type { IOrderByOption } from './order-by-option'
 
 export interface IPostPhotosetReorderRequest {
   nsid: string

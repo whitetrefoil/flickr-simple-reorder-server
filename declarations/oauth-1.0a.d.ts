@@ -1,7 +1,7 @@
 declare module 'oauth-1.0a' {
   declare namespace o {
-    declare type ISignatureMethod = 'HMAC-SHA1' | 'HMAC-SHA256'
-    declare type IMethod = 'GET' | 'POST'
+    declare type ISignatureMethod = 'HMAC-SHA1'|'HMAC-SHA256'
+    declare type IMethod = 'GET'|'POST'
 
     export interface IOAuthToken {
       key: string
@@ -11,17 +11,18 @@ declare module 'oauth-1.0a' {
     export interface IOAuthOptions {
       consumer: IOAuthToken
       signature_method: ISignatureMethod
-      hash_function(base_string: string, key: string): string
+      hash_function: (base_string: string, key: string) => string
     }
 
     export interface IRequest {
       url: string
       method: IMethod
-      data: any
+      data: unknown
     }
 
     export static class OAuth {
-      authorize(request: IRequest, token: IOAuthToken | {}): any
+      // eslint-disable-next-line @typescript-eslint/ban-types
+      authorize(request: IRequest, token: IOAuthToken|{}): unknown
     }
   }
 

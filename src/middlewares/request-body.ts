@@ -1,9 +1,11 @@
-import { Middleware } from 'koa'
-import * as _         from 'lodash'
+import type { Middleware } from 'koa'
 
 function requestBodyFactory(): Middleware {
   return async(ctx, next) => {
-    ctx.request.mergedBody = _.assign({}, ctx.query, ctx.request.body)
+    ctx.request.mergedBody = {
+      ...ctx.query,
+      ...ctx.request.body,
+    }
     await next()
   }
 }

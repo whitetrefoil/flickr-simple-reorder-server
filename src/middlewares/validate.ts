@@ -1,11 +1,11 @@
-import { Middleware } from 'koa'
-import * as _         from 'lodash'
+import { get }             from 'dot-prop'
+import type { Middleware } from 'koa'
 
 function validateFactory(): Middleware {
   return async(ctx, next) => {
     ctx.validateRequire = (fields: string[]) => {
-      _.forEach(fields, (field) => {
-        ctx.assert(!_.isNil(_.get(ctx.request.mergedBody, field)), 400, `"${field}" is required.`)
+      fields.forEach(field => {
+        ctx.assert(get(ctx.request.mergedBody, field) != null, 400, `"${field}" is required.`)
       })
     }
 

@@ -1,10 +1,10 @@
-/* tslint:disable:no-console */
+/* eslint-disable node/no-process-exit,no-process-exit */
 
-import Chalk     from 'chalk'
-import * as fs   from 'fs-extra'
-import * as _    from 'lodash'
-import * as meow from 'meow'
-import * as path from 'path'
+import Chalk            from 'chalk'
+import log, { error }   from 'fancy-log'
+import fs               from 'fs-extra'
+import meow, { Result } from 'meow'
+import path             from 'path'
 
 export type ILogLevel = 'error'|'warning'|'log'
 export type IEnv = 'development'|'testing'|'production'
@@ -12,14 +12,16 @@ export type IEnv = 'development'|'testing'|'production'
 interface IFlags {
   help: boolean
   version: boolean
-  port: number
-  key: string
-  secret: string
-  callback: string
-  logLevel: string
-  dev: boolean
+  port?: number
+  key?: string
+  secret?: string
+  callback?: string
+  logLevel?: string
+  dev?: boolean
   config: string
 }
+
+type IMeowResult = Result<EmptyObject>&{ flags: IFlags }
 
 export interface IConfig {
   port: number
@@ -29,21 +31,30 @@ export interface IConfig {
   logLevel: ILogLevel
   env: IEnv
 
-  isDev(): boolean
+  isDev: () => boolean
 }
 
-const DEFAULT_PORT                     = 3000
-const DEFAULT_KEY                      = '5cdc0f5ec9c28202f1098f615edba5cd'
-const DEFAULT_SECRET                   = 'e3b842e3b923b0fb'
-const DEFAULT_CALLBACK                 = 'http://localhost:8000/#/login'
-const DEFAULT_LOG_LEVEL: ILogLevel     = 'error'
-const DEFAULT_ENV: IEnv                = 'production'
+interface IConfigFile {
+  port?: unknown
+  key?: unknown
+  secret?: unknown
+  callback?: unknown
+  logLevel?: unknown
+  env?: IEnv
+}
+
+const DEFAULT_PORT = 3000
+const DEFAULT_KEY = '5cdc0f5ec9c28202f1098f615edba5cd'
+const DEFAULT_SECRET = 'e3b842e3b923b0fb'
+const DEFAULT_CALLBACK = 'http://localhost:8000/#/login'
+const DEFAULT_LOG_LEVEL: ILogLevel = 'error'
+const DEFAULT_ENV: IEnv = 'production'
 const AVAILABLE_LOG_LEVEL: ILogLevel[] = ['error', 'warning', 'log']
-const AVAILABLE_ENV: IEnv[]            = ['production', 'testing', 'development']
+const AVAILABLE_ENV: IEnv[] = ['production', 'testing', 'development']
 
 const { gray, green, yellow } = Chalk
 
-const cli = meow<IFlags>(
+const cli: IMeowResult = meow(
   `
   Options                                                     [${gray('default value')}]
     -h, --help     Show this help message then exit
@@ -74,66 +85,65 @@ const cli = meow<IFlags>(
 `,
   {
     flags: {
-      help    : { alias: 'h', type: 'boolean' },
-      version : { alias: 'v', type: 'boolean' },
-      port    : { alias: 'p' },
+      help    : { alias: 'h', type: 'boolean', default: false },
+      version : { alias: 'v', type: 'boolean', default: false },
+      port    : { alias: 'p', type: 'number' },
       key     : { alias: 'k', type: 'string' },
       secret  : { alias: 's', type: 'string' },
       callback: { alias: 'b', type: 'string' },
       logLevel: { alias: 'l', type: 'string' },
-      dev     : { alias: 'd', default: false, type: 'boolean' },
-      config  : { alias: 'c', default: 'config.json', type: 'string' },
+      dev     : { alias: 'd', type: 'boolean', default: false },
+      config  : { alias: 'c', type: 'string', default: 'config.json' },
     },
   },
 )
 
 const configFileLocation = path.resolve(cli.flags.config)
 
-let configFromFile
+let configFromFile!: IConfigFile
 
 try {
-  console.log(`Reading config file from "${configFileLocation}".`)
-  configFromFile = fs.readJsonSync(configFileLocation)
-} catch (e) {
-  if (e.code === 'ENOENT') {
-    console.log(`Config file not found. Generating example config file at "${configFileLocation}".`)
+  log(`Reading config file from "${configFileLocation}".`)
+  configFromFile = fs.readJsonSync(configFileLocation) as IConfigFile
+} catch (e: unknown) {
+  if ((e as NodeJS.ErrnoException).code === 'ENOENT') {
+    log(`Config file not found. Generating example config file at "${configFileLocation}".`)
     try {
       fs.copySync(path.join(__dirname, '../../config.default.json'), configFileLocation)
-      console.log('Done generating.  Please modify the config file then run again.  Exiting...')
+      log('Done generating.  Please modify the config file then run again.  Exiting...')
       process.exit(1)
-    } catch (e2) {
-      console.error(`Cannot generate example config file at "${configFileLocation}".  Exiting...`)
+    } catch (e2: unknown) {
+      error(`Cannot generate example config file at "${configFileLocation}".  Exiting...`)
       process.exit(-1)
     }
   }
 }
 
+function defaultChain<T>(values: unknown[], defaultVal: T, validator?: (val: unknown) => boolean): T {
+  return values.find(value => value != null && (validator == null || validator(value))) as T|undefined ?? defaultVal
+}
+
+function isAvailableEnv(env: string|nil): env is IEnv {
+  return AVAILABLE_ENV.includes(env as IEnv)
+}
+
+const env = isAvailableEnv(process.env.NODE_ENV) ? process.env.NODE_ENV
+  : cli.flags.dev === true ? 'development'
+    : isAvailableEnv(configFromFile?.env) ? configFromFile.env
+      : DEFAULT_ENV
+
 const config: IConfig = {
-  port    : _.isFinite(cli.flags.port) ? cli.flags.port : (configFromFile.port || DEFAULT_PORT),
-  key     : cli.flags.key || configFromFile.key || DEFAULT_KEY,
-  secret  : cli.flags.secret || configFromFile.secret || DEFAULT_SECRET,
-  callback: cli.flags.callback || configFromFile.callback || DEFAULT_CALLBACK,
-  logLevel: null,
-  env     : null,
+  port    : defaultChain([cli.flags.port, configFromFile?.port], DEFAULT_PORT, Number.isFinite),
+  key     : defaultChain([cli.flags.key, configFromFile?.key], DEFAULT_KEY),
+  secret  : defaultChain([cli.flags.secret, configFromFile?.secret], DEFAULT_SECRET),
+  callback: defaultChain([cli.flags.callback, configFromFile?.callback], DEFAULT_CALLBACK),
+  logLevel: defaultChain(
+    [cli.flags.logLevel, configFromFile?.logLevel],
+    DEFAULT_LOG_LEVEL,
+    val => AVAILABLE_LOG_LEVEL.includes(val as ILogLevel),
+  ),
+  env,
   isDev   : () => config.env === 'development',
-}
-
-if (_.includes(AVAILABLE_LOG_LEVEL, cli.flags.logLevel)) {
-  config.logLevel = cli.flags.logLevel
-} else if (_.includes(AVAILABLE_LOG_LEVEL, configFromFile.logLevel)) {
-  config.logLevel = configFromFile.logLevel
-} else {
-  config.logLevel = DEFAULT_LOG_LEVEL
-}
-
-if (_.includes(AVAILABLE_ENV, process.env.NODE_ENV)) {
-  config.env = process.env.NODE_ENV as IEnv
-} else if (cli.flags.dev) {
-  config.env = 'development'
-} else if (_.includes(AVAILABLE_ENV, configFromFile.env)) {
-  config.env = configFromFile.env
-} else {
-  config.env = DEFAULT_ENV
 }
 
 process.env.NODE_ENV = config.env

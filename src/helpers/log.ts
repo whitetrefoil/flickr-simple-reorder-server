@@ -1,11 +1,12 @@
-/* tslint:disable:no-console */
+/* eslint-disable no-console */
 
 import { getLogger, setFilter } from '@whitetrefoil/debug-log'
-import * as _                   from 'lodash'
-import * as timestamp           from 'time-stamp'
+import timestamp                from 'time-stamp'
 import config                   from './config'
 
-if (_.isEmpty(process.env.DEBUG)) { setFilter('/') }
+if (process.env.DEBUG == null || process.env.DEBUG.length === 0) {
+  setFilter('/')
+}
 
 export const debug = getLogger
 
@@ -14,12 +15,16 @@ function datetime(): string {
 }
 
 export function log(...args: any[]): void {
-  if (config.logLevel !== 'log') { return }
+  if (config.logLevel !== 'log') {
+    return
+  }
   console.log(datetime(), '- LOG -', ...args)
 }
 
 export function warn(...args: any[]): void {
-  if (config.logLevel === 'error') { return }
+  if (config.logLevel === 'error') {
+    return
+  }
   console.warn(datetime(), '- WAR -', ...args)
 }
 

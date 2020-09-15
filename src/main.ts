@@ -1,19 +1,18 @@
-import * as koaBodyparser     from 'koa-bodyparser'
-import * as koaConditionalGet from 'koa-conditional-get'
-import * as koaEtag           from 'koa-etag'
-import * as koaHelmet         from 'koa-helmet'
-import * as koaLogger         from 'koa-logger'
-import config                 from './helpers/config'
-import { log }                from './helpers/log'
-import errorFormatter         from './middlewares/error-formatter'
-import requestBody            from './middlewares/request-body'
-import responseBody           from './middlewares/response-body'
-import validate               from './middlewares/validate'
-import auth                   from './routes/auth'
-import photosets              from './routes/photosets'
-import app                    from './server'
-
-const mount = require('koa-mount')
+import koaBodyparser     from 'koa-bodyparser'
+import koaConditionalGet from 'koa-conditional-get'
+import koaEtag           from 'koa-etag'
+import koaHelmet         from 'koa-helmet'
+import koaLogger         from 'koa-logger'
+import koaMount          from 'koa-mount'
+import config            from './helpers/config'
+import { log }           from './helpers/log'
+import errorFormatter    from './middlewares/error-formatter'
+import requestBody       from './middlewares/request-body'
+import responseBody      from './middlewares/response-body'
+import validate          from './middlewares/validate'
+import auth              from './routes/auth'
+import photosets         from './routes/photosets'
+import app               from './server'
 
 app.use(responseBody())
 app.use(koaLogger())
@@ -25,10 +24,10 @@ app.use(errorFormatter())
 app.use(requestBody())
 app.use(validate())
 
-app.use(mount('/api/auth', auth.routes()))
-app.use(mount('/api/auth', auth.allowedMethods()))
-app.use(mount('/api/photosets', photosets.routes()))
-app.use(mount('/api/photosets', photosets.allowedMethods()))
+app.use(koaMount('/api/auth', auth.routes()))
+app.use(koaMount('/api/auth', auth.allowedMethods()))
+app.use(koaMount('/api/photosets', photosets.routes()))
+app.use(koaMount('/api/photosets', photosets.allowedMethods()))
 
 app.listen(config.port, () => {
   log(`Server started at port ${config.port}`)
