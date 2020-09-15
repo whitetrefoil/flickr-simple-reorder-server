@@ -1,8 +1,5 @@
-'use strict'
-
-require('chai').should()
-
-const format = require('../../lib/helpers/format-api').default
+import { expect }      from 'chai'
+import formatFlickrApi from '~/helpers/format-api'
 
 describe('Helpers', () => {
   describe(':: Format API', () => {
@@ -22,9 +19,9 @@ describe('Helpers', () => {
         },
       }
 
-      const output = format(input)
+      const output = formatFlickrApi(input)
 
-      output.should.eql({
+      expect(output).to.eql({
         a: {
           b: [
             { c: 'd' },

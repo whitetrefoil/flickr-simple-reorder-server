@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs"                       : true,
+    "allowJs"                       : false,
     "baseUrl"                       : ".",
     "declaration"                   : false,
     "declarationDir"                : null,
@@ -25,8 +25,7 @@
     "target"                        : "es2018"
   },
   "include"        : [
-    "src/**/*.ts",
-    "src/**/*.js",
-    "declarations/*.d.ts"
+    "declarations/**/*.d.ts",
+    "src/**/*.ts"
   ]
 }

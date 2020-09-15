@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 
-import { getLogger, setFilter } from '@whitetrefoil/debug-log'
-import timestamp                from 'time-stamp'
-import config                   from './config'
+import { setFilter } from '@whitetrefoil/debug-log'
+import timestamp     from 'time-stamp'
+import config        from './config'
+
+export { getLogger } from '@whitetrefoil/debug-log'
 
 if (process.env.DEBUG == null || process.env.DEBUG.length === 0) {
   setFilter('/')
 }
-
-export const debug = getLogger
 
 function datetime(): string {
   return timestamp('YYYY-MM-DD HH:mm:ss.ms')

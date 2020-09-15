@@ -1,11 +1,9 @@
-import * as crypto  from 'crypto'
-import * as _       from 'lodash'
-import * as OAuth   from 'oauth-1.0a'
-import * as qs      from 'querystring'
-import * as request from 'superagent'
-import config       from '../helpers/config'
-import format       from './format-api'
-import { debug }    from './log'
+import crypto    from 'crypto'
+import OAuth     from 'oauth-1.0a'
+import qs        from 'querystring'
+import config    from '../helpers/config'
+import format    from './format-api'
+import { debug } from './log'
 
 
 const oauth = OAuth({
@@ -22,7 +20,12 @@ const oauth = OAuth({
 
 const debugGetAuth = debug('/helpers/flickr.js - getAuth()').debug
 
-export async function getAuth(url: string, data: any, token?: string, secret?: string): Promise<any> {
+export async function getAuth(
+  url: string,
+  data: { oauth_callback: string }|{ oauth_token: string, oauth_verifier: string },
+  token?: string,
+  secret?: string,
+): Promise<any> {
   const requestData: OAuth.IRequest = {
     url,
     method: 'GET',

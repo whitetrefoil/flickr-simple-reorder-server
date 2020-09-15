@@ -17,3 +17,9 @@ extends:
 
 rules:
   "node/callback-return": [ 0 ]
+
+overrides:
+  - files:
+    - "tests/**/*.ts"
+    env:
+      mocha: true

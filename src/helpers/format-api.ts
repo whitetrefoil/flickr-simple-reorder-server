@@ -1,23 +1,40 @@
-import * as _ from 'lodash'
+import { isPrimitive, Primitive } from 'utility-types'
+import isPlainObject              from './is-plain-object'
 
-export interface IFlickrResponseContent {
-  _content?: string|number
+export type IFlickrResponseContent = {
+  [key: string]: Primitive|IFlickrResponseContent
+}|{ _content?: Primitive }
 
-  [key: string]: string|number|IFlickrResponseContent
+function isContent(val: unknown): val is { _content: Primitive } {
+  if (val == null) {
+    return false
+  }
+  const content = (val as { _content: Primitive })._content
+  return content != null && isPrimitive(content)
 }
 
-function formatFlickrApi(obj: IFlickrResponseContent): any {
-  if (_.isNil(obj)) { return null }
+function formatFlickrApi(obj: unknown): unknown {
+  if (obj == null) {
+    return null
+  }
 
-  if (obj._content) { return obj._content }
+  if (isContent(obj)) {
+    return obj._content
+  }
 
-  if (_.isPlainObject(obj)) {
-    return _.mapValues(obj, formatFlickrApi)
-  } else if (_.isArray(obj)) {
-    return _.map(obj, formatFlickrApi)
+  if (Array.isArray(obj)) {
+    return obj.map(formatFlickrApi)
+  }
+
+  if (isPlainObject(obj)) {
+    return Object.keys(obj).reduce((prev, curr) => ({
+      ...prev,
+      [curr]: formatFlickrApi(obj[curr]),
+    }), {})
   }
 
   return obj
 }
+
 
 export default formatFlickrApi
