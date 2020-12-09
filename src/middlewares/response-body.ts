@@ -1,30 +1,29 @@
-import { Middleware } from 'koa'
-import { Stream }     from 'stream'
-import { debug }      from '../helpers/log'
+import { Stream }           from 'stream'
+import { getLogger }        from '~/helpers/log'
+import type { IMiddleware } from '~/interfaces/middleware'
 
-const debugResponseBodyFactory = debug('/middlewares/response-body.ts').debug
+const { debug } = getLogger(`/src/${__filename.split('?')[0]}`)
 
-function responseBodyFactory(): Middleware {
+function responseBodyFactory(): IMiddleware {
   return async(ctx, next) => {
     await next()
 
-    const body = ctx.body
+    // eslint-disable-next-line prefer-destructuring
+    const body = ctx.body as unknown
 
     if (body instanceof Stream) {
-      debugResponseBodyFactory('body is a stream')
+      debug('body is a stream')
       return
     }
 
-    const devMessage = ctx.devMessage
-    const code       = ctx.status
+    const { devMessage } = ctx
+    const code = ctx.status
 
-    const formattedBody = {
+    ctx.body = {
       code,
       devMessage,
       data: body,
     }
-
-    ctx.body = formattedBody
   }
 }
 

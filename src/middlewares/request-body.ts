@@ -11,3 +11,9 @@ function requestBodyFactory(): Middleware {
 }
 
 export default requestBodyFactory
+
+declare module 'koa' {
+  interface Request {
+    mergedBody: Dict
+  }
+}

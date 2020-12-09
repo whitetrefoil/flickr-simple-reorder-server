@@ -1,4 +1,4 @@
-export interface IUser {
+export interface User {
   nsid: string
   iconServer: string
   iconFarm: number

@@ -1,7 +1,7 @@
-import type { IToken } from './token'
-import type { IUser }  from './user'
+import type { Token } from '~/interfaces/token'
+import type { User }  from '~/interfaces/user'
 
 export interface IGetAccessTokenResponse {
-  token: IToken
-  user: IUser
+  token: Token
+  user: User
 }

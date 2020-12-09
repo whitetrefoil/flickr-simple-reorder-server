@@ -1,19 +1,17 @@
 import got           from 'got'
 import qs            from 'qs'
 import config        from '~/helpers/config'
-import { getLogger } from '../helpers/log'
-import oauth         from '../helpers/oauth'
+import { getLogger } from '~/helpers/log'
+import oauth         from '~/helpers/oauth'
 
 const { debug } = getLogger(`/src/${__filename.split('?')[0]}`)
 
-const url = 'https://www.flickr.com/services/oauth/access_token'
+const url = 'https://www.flickr.com/services/oauth/request_token'
 
 export default async function oauthRequestToken(): Promise<{
-  fullname: string
+  oauth_callback_confirmed: boolean
   oauth_token: string
   oauth_token_secret: string
-  user_nsid: string
-  username: string
 }> {
 
   const requestData: OAuth.RequestOptions = {
@@ -24,13 +22,13 @@ export default async function oauthRequestToken(): Promise<{
     },
   }
 
-  const authorized = oauth.authorize(requestData)
+  const authorized = oauth().authorize(requestData)
 
-  const { body } = await got(url, {
+  const body = await got(url, {
     searchParams: {
       ...authorized,
     },
-  })
+  }).text()
 
   debug(body)
 
@@ -41,4 +39,9 @@ export default async function oauthRequestToken(): Promise<{
     oauth_token             : parsedQs.oauth_token as string,
     oauth_token_secret      : parsedQs.oauth_token_secret as string,
   }
+}
+
+
+if (require.main === module) {
+  debug(oauthRequestToken())
 }

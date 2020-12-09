@@ -1,4 +1,4 @@
-export interface IToken {
+export interface Token {
   key: string
   secret: string
 }

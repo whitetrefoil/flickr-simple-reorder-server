@@ -1,5 +1,5 @@
-import type { IToken } from './token'
+import type { Token } from "~/interfaces/token";
 
 export interface IGetLoginTokenResponse {
-  token: IToken
+  token: Token
 }

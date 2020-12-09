@@ -6,6 +6,7 @@ import koaLogger         from 'koa-logger'
 import koaMount          from 'koa-mount'
 import config            from './helpers/config'
 import { log }           from './helpers/log'
+import assertPayload     from './middlewares/assert-payload'
 import errorFormatter    from './middlewares/error-formatter'
 import requestBody       from './middlewares/request-body'
 import responseBody      from './middlewares/response-body'
@@ -23,6 +24,7 @@ app.use(koaBodyparser())
 app.use(errorFormatter())
 app.use(requestBody())
 app.use(validate())
+app.use(assertPayload())
 
 app.use(koaMount('/api/auth', auth.routes()))
 app.use(koaMount('/api/auth', auth.allowedMethods()))

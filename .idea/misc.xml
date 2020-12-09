@@ -62,4 +62,5 @@
     <option name="customLauncherPath" value="/opt/sbt/latest/bin/sbt-launch.jar" />
     <option name="customVMPath" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home" />
   </component>
+  <component name="jetbrains.communicator.idea.IdProvider" IDEtalkID="05CFE653DA50756EA9D1F926AB3B0D5B" />
 </project>

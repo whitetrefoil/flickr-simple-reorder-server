@@ -1,6 +1,7 @@
-interface Indexed<T> {[key: string]: T}
+// interface Indexed<T> {[key: string]: T}
+type Dict<T = unknown> = Record<string, T>
 
-type SimpleSet = Indexed<true>
+type SimpleSet = Dict<true>
 
 type Resolved<T> = T extends PromiseLike<infer F> ? F : T
 type ResolvedReturn<T> = T extends (...args: any[]) => PromiseLike<infer F> ? F
