@@ -1,18 +1,17 @@
 {
   "name": "@whitetrefoil/flickr-simple-reorder-server",
-  "version": "0.2.4",
+  "version": "0.3.0",
+  "type": "module",
   "description": "A simple tool to help reorder photos in galleries.",
-  "main": "lib/common/main.js",
-  "module": "lib/esm/main.js",
-  "typings": "lib/types/main.d.ts",
   "bin": {
     "flickr-simple-reorder": "bin/flickr-simple-reorder"
   },
   "scripts": {
-    "prepublishOnly": "node scripts/prepublish-checklist.js && npm run build",
-    "build": "rimraf lib && tsc && tsc -p tsconfig.common.json",
-    "test": "npm run build && mocha --recursive tests",
-    "coverage": "npm run build && rimraf .nyc_output && nyc mocha --recursive tests"
+    "prepublishOnly": "node scripts/prepublish-checklist.js && yarn build",
+    "build": "rimraf lib && tsc -p src/tsconfig.json",
+    "test": "rimraf test_results && eslint . ; jest --no-cache",
+    "test-ci": "rimraf test_results && eslint -o test_results/eslint/junit.xml -f junit . ; jest -i --no-cache",
+    "watch": "tsc --watch -p src/tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -29,62 +28,56 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=8.9.3"
+    "node": ">=14.18.0"
   },
   "dependencies": {
-    "@types/koa-bodyparser": "^3.0.26",
-    "@types/koa-helmet": "^3.1.2",
-    "@types/koa-logger": "^3.1.0",
-    "@types/koa-mount": "^2.0.19",
-    "@types/koa-router": "^7.0.27",
-    "@types/statuses": "^1.3.0",
-    "@whitetrefoil/debug-log": "^0.1.1",
-    "chalk": "^2.3.0",
-    "fs-extra": "^5.0.0",
-    "koa": "^2.4.1",
-    "koa-bodyparser": "^4.2.0",
-    "koa-conditional-get": "^2.0.0",
-    "koa-etag": "^3.0.0",
-    "koa-helmet": "^3.3.0",
-    "koa-logger": "^3.1.0",
-    "koa-mount": "^3.0.0",
-    "koa-router": "^7.3.0",
-    "lodash": "^4.17.4",
-    "meow": "^4.0.0",
-    "oauth-1.0a": "^2.2.3",
-    "statuses": "^1.4.0",
-    "superagent": "^3.8.2",
+    "@whitetrefoil/debug-log": "^0.1.2",
+    "chalk": "^5.0.1",
+    "fs-extra": "^10.1.0",
+    "got": "^12.1.0",
+    "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
+    "koa-conditional-get": "^3.0.0",
+    "koa-etag": "^4.0.0",
+    "koa-helmet": "^6.1.0",
+    "koa-logger": "^3.2.1",
+    "koa-mount": "^4.0.0",
+    "koa-router": "^10.1.1",
+    "lodash-es": "^4.17.21",
+    "meow": "^10.1.3",
+    "oauth-1.0a": "^2.2.6",
+    "statuses": "^2.0.1",
     "through": "^2.3.8",
-    "time-stamp": "^2.0.0"
+    "time-stamp": "^2.2.0",
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "^5.0.0",
-    "@types/koa": "^2.0.43",
-    "@types/lodash": "^4.14.91",
-    "@types/meow": "^3.6.2",
-    "@types/node": "^8.5.1",
-    "@types/superagent": "^3.5.6",
-    "@types/through": "0.0.29",
-    "chai": "^4.1.2",
-    "mocha": "^4.0.1",
-    "nyc": "^11.4.1",
-    "rimraf": "^2.6.2",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.2"
+    "@types/fs-extra": "^9.0.13",
+    "@types/got": "^9.6.12",
+    "@types/koa": "^2.13.4",
+    "@types/koa-bodyparser": "^4.3.7",
+    "@types/koa-conditional-get": "^2.0.0",
+    "@types/koa-etag": "^3.0.0",
+    "@types/koa-helmet": "^6.0.4",
+    "@types/koa-logger": "^3.1.2",
+    "@types/koa-mount": "^4.0.1",
+    "@types/koa-router": "^7.4.4",
+    "@types/lodash-es": "^4.17.6",
+    "@types/meow": "^5.0.0",
+    "@types/node": "^18.0.1",
+    "@types/statuses": "^2.0.0",
+    "@types/through": "0.0.30",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "@whitetrefoil/eslint-config": "^0.28.0",
+    "eslint": "^8.17.0",
+    "eslint-plugin-node": "^11.1.0",
+    "jest": "^28.1.2",
+    "jest-junit": "^14.0.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.4"
   },
-  "nyc": {
-    "include": [
-      "lib/**/*.js"
-    ],
-    "exclude": [
-      "lib/api",
-      "lib/declarations"
-    ],
-    "reporter": [
-      "lcov",
-      "text-summary"
-    ],
-    "report-dir": "./test_results",
-    "all": true
-  }
+  "packageManager": "yarn@3.2.1"
 }
