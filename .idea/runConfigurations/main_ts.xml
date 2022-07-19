@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.ts" type="NodeJSConfigurationType" factoryName="Node.js" application-parameters="-d" path-to-node="$PROJECT_DIR$/../../DWZQ/Redirect_Page/redirect-page-2/node_modules/ts-node/dist/bin.js" node-parameters="-P tsconfig.common.json" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="main.ts" type="NodeJSConfigurationType" application-parameters="-d" path-to-node="$PROJECT_DIR$/../../DWZQ/Redirect_Page/redirect-page-2/node_modules/ts-node/dist/bin.js" node-parameters="-P src/tsconfig.json --esm -T" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
     <envs>
       <env name="DEBUG" value="/*" />
     </envs>
-    <method />
+    <method v="2" />
   </configuration>
 </component>

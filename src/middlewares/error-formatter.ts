@@ -1,39 +1,54 @@
-import { Middleware } from 'koa'
-import * as _         from 'lodash'
-import * as statuses  from 'statuses'
-import * as log       from '../helpers/log'
+import { getLogger } from '@whitetrefoil/debug-log'
+import type { Middleware } from 'koa'
+import { HttpError } from 'koa'
+import statuses from 'statuses'
+import * as log from '../helpers/log.js'
+import type { StateWithDevMessage } from './response-body.js'
 
-const { debug } = log.debug('/middlewares/error-formatter.js')
 
-function errorFormatterFactory(): Middleware {
+const { debug } = getLogger(import.meta.url)
+
+
+function errorFormatterFactory(): Middleware<StateWithDevMessage> {
   return async(ctx, next) => {
     try {
       await next()
-    } catch (error) {
-      debug(error)
+    } catch (e: unknown) {
+      debug(e)
+      if (!(e instanceof Error)) {
+        throw new Error(`Unknown error: ${String(e)}`)
+      }
 
-      ctx.status = error.status || 500
+      if (!(e instanceof HttpError)) {
+        throw e
+      }
 
-      if (error.response == null) {
-        ctx.body = { message: error.message || error }
+      ctx.status = e.status ?? 500
+
+      if (e.response == null) {
+        ctx.body = { message: e.message }
         return
       }
 
-      ctx.body = { message: statuses[ctx.status] }
-      log.error(error.message)
+      ctx.body = { message: statuses[ctx.status] as string }
+      log.error(e.message)
 
-      if (!_.isEmpty(error.response.error)) {
-        ctx.devMessage = error.response.error
-        return
-      }
+      // if (ctx.state.devMessage != null) {
+      //   ctx.body.devMessage = ctx.state.devMessage
+      // }
 
-      if (!_.isEmpty(error.response.body)) {
-        ctx.devMessage = error.response.body
-        return
-      }
-
-      ctx.devMessage = error.response.text
-      return
+      // if (!_.isEmpty(e.response.error)) {
+      //   ctx.devMessage = e.response.error
+      //   return
+      // }
+      //
+      // if (!_.isEmpty(e.response.body)) {
+      //   ctx.devMessage = e.response.body
+      //   return
+      // }
+      //
+      // ctx.devMessage = e.response.text
+      // return
     }
   }
 }

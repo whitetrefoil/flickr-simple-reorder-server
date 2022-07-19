@@ -1,7 +1,0 @@
-{
-  "key"     : "5cdc0f5ec9c28202f1098f615edba5cd",
-  "secret"  : "e3b842e3b923b0fb",
-  "callback": "http://localhost:8000/#/login",
-  "env"     : "production",
-  "logLevel": "error"
-}

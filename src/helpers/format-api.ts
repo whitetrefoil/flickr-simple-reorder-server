@@ -1,23 +1,42 @@
-import * as _ from 'lodash'
+import * as _ from 'lodash-es'
 
-export interface IFlickrResponseContent {
-  _content?: string|number
 
-  [key: string]: string|number|IFlickrResponseContent
+export interface IFlickrWrappedContent<T = string> {
+  _content: T
 }
 
-function formatFlickrApi(obj: IFlickrResponseContent): any {
-  if (_.isNil(obj)) { return null }
+export type IFlickrResponseValue = string|number|IFlickrWrappedContent<string|number>|{
+  [key: string]: IFlickrResponseValue
+}
 
-  if (obj._content) { return obj._content }
+// export interface IFlickrResponseContent {
+//   _content?: string|number
+//
+//   [key: string]: string|number|IFlickrResponseContent|undefined
+// }
+
+export interface IFlickrResponseObj {
+  [key: string]: IFlickrResponseValue
+}
+
+
+function formatFlickrApi(obj: IFlickrResponseObj): unknown {
+  if (obj == null) {
+    return null
+  }
+
+  if (obj._content != null) {
+    return obj._content
+  }
 
   if (_.isPlainObject(obj)) {
     return _.mapValues(obj, formatFlickrApi)
-  } else if (_.isArray(obj)) {
+  } else if (Array.isArray(obj)) {
     return _.map(obj, formatFlickrApi)
   }
 
   return obj
 }
+
 
 export default formatFlickrApi

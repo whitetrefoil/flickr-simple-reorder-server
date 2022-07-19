@@ -1,22 +1,29 @@
-import { Middleware } from 'koa'
-import { Stream }     from 'stream'
-import { debug }      from '../helpers/log'
+import { getLogger } from '@whitetrefoil/debug-log'
+import type { DefaultState, Middleware } from 'koa'
+import { Stream } from 'stream'
 
-const debugResponseBodyFactory = debug('/middlewares/response-body.ts').debug
 
-function responseBodyFactory(): Middleware {
+const { debug } = getLogger(import.meta.url)
+
+
+export interface StateWithDevMessage extends DefaultState {
+  devMessage?: string
+}
+
+
+function responseBodyFactory(): Middleware<StateWithDevMessage> {
   return async(ctx, next) => {
     await next()
 
-    const body = ctx.body
+    const body = ctx.body as unknown
 
     if (body instanceof Stream) {
-      debugResponseBodyFactory('body is a stream')
+      debug('body is a stream')
       return
     }
 
-    const devMessage = ctx.devMessage
-    const code       = ctx.status
+    const { devMessage } = ctx.state
+    const code = ctx.status
 
     const formattedBody = {
       code,

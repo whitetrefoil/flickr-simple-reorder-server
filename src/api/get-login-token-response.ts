@@ -1,4 +1,4 @@
-import { IToken } from './token'
+import type { IToken } from './token.js'
 
 export interface IGetLoginTokenResponse {
   token: IToken

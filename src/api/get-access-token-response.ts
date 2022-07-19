@@ -1,5 +1,5 @@
-import { IToken } from './token'
-import { IUser }  from './user'
+import type { IToken } from './token.js'
+import type { IUser } from './user.js'
 
 export interface IGetAccessTokenResponse {
   token: IToken
