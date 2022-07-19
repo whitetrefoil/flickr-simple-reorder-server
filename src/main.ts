@@ -15,27 +15,29 @@ import { authRouter } from './routes/auth.js'
 import { photosetsRouter } from './routes/photosets.js'
 
 
-const router = new Router()
-  .use('/api/auth', authRouter.routes(), authRouter.allowedMethods())
-  .use('/api/photosets', photosetsRouter.routes(), photosetsRouter.allowedMethods())
+export async function main() {
+  const router = new Router()
+    .use('/api/auth', authRouter.routes(), authRouter.allowedMethods())
+    .use('/api/photosets', photosetsRouter.routes(), photosetsRouter.allowedMethods())
 
 
-new Koa()
-  .use(responseBody())
-  .use(koaLogger())
-  .use(koaHelmet())
-  .use(koaConditionalGet())
-  .use(koaEtag())
-  .use(koaBodyparser())
-  .use(errorFormatter())
-  .use(requestBody())
-  .use(validate())
-  .use(router.routes())
-  .use(router.allowedMethods())
+  new Koa()
+    .use(responseBody())
+    .use(koaLogger())
+    .use(koaHelmet())
+    .use(koaConditionalGet())
+    .use(koaEtag())
+    .use(koaBodyparser())
+    .use(errorFormatter())
+    .use(requestBody())
+    .use(validate())
+    .use(router.routes())
+    .use(router.allowedMethods())
 
-  .listen(config.port, () => {
-    log(`Server started at port ${config.port}`)
-  })
+    .listen(config.port, () => {
+      log(`Server started at port ${config.port}`)
+    })
+}
 
 
 export * from './api/index.js'

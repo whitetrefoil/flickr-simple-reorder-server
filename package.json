@@ -9,7 +9,7 @@
     "./lib/api": "./lib/api.js"
   },
   "bin": {
-    "flickr-simple-reorder": "bin/flickr-simple-reorder"
+    "flickr-simple-reorder": "./bin/flickr-simple-reorder.js"
   },
   "scripts": {
     "prepublishOnly": "node scripts/prepublish-checklist.js && yarn build",
