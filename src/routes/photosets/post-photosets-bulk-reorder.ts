@@ -1,6 +1,5 @@
 import type { Middleware } from '@koa/router'
 import type { DefaultState } from 'koa'
-import { PassThrough, Readable, Transform } from 'stream'
 import type { ContextWithMergedBody } from '../../middlewares/request-body.js'
 import type { MaybeObj } from '../../utils/types.js'
 import { reorderPhotoset } from './utils.js'
@@ -29,12 +28,12 @@ export const postPhotosetsBulkReorder: Middleware<DefaultState, ContextWithMerge
     return
   }
 
-  // const stream = new PassThrough()
-  const stream = new Readable({
-    highWaterMark: 1,
-  })
+  // const s = new PassThrough()
+  // ctx.body = s
+  ctx.status = 200
+  ctx.type = 'application/octet-stream'
   ctx.set({ 'X-Accel-Buffering': 'no' })
-  ctx.body = stream
+  ctx.set({ 'Transfer-Encoding': 'chunked' })
 
   await Promise.allSettled(setIds.map(async(setId: unknown) => {
     const sId = String(setId)
@@ -42,19 +41,25 @@ export const postPhotosetsBulkReorder: Middleware<DefaultState, ContextWithMerge
     try {
       const res = await reorderPhotoset(nsid, sId, orderBy, isDesc, token, secret)
       if (res.result.isSkipped) {
-        stream.push(`${sId}:k,`)
+        ctx.res.write(`${sId}:k,`)
+        // s.push(`${sId}:k,`)
         return
       }
       if (res.result.isSuccessful) {
-        stream.push(`${sId}:s,`)
+        ctx.res.write(`${sId}:s,`)
+        // s.push(`${sId}:s,`)
         return
       }
-      stream.push(`${sId}:f,`)
+      ctx.res.write(`${sId}:f,`)
+      // s.push(`${sId}:f,`)
     } catch (e: unknown) {
-      stream.push(`${sId}:f,`)
+      ctx.res.write(`${sId}:f,`)
+      // s.push(`${sId}:f,`)
     }
   }))
     .finally(() => {
-      stream.push(null)
+      ctx.res.write('')
+      ctx.res.end()
+      // s.end()
     })
 }
