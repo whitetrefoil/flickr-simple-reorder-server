@@ -1,7 +1,8 @@
-import got from 'got'
 import qs from 'querystring'
+import { client } from '../client.js'
 import { getLogger } from '../log.js'
-import { authorize, OAuthData, OAuthRequestOption } from './oauth.js'
+import type { OAuthData } from './oauth.js'
+import { authorize } from './oauth.js'
 
 const { debug } = getLogger(import.meta.url)
 
@@ -14,7 +15,7 @@ export async function getAuth<T extends OAuthData>(
 ): Promise<unknown> {
   const requestData = { method: 'GET', url, data, key, secret }
 
-  const raw = await got.get(url, {
+  const raw = await client.get(url, {
     searchParams: authorize(requestData),
   })
 

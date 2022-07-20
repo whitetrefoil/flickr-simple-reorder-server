@@ -1,6 +1,6 @@
 import type { Middleware } from '@koa/router'
 import type { DefaultState } from 'koa'
-import { Transform } from 'stream'
+import { PassThrough, Readable, Transform } from 'stream'
 import type { ContextWithMergedBody } from '../../middlewares/request-body.js'
 import type { MaybeObj } from '../../utils/types.js'
 import { reorderPhotoset } from './utils.js'
@@ -29,7 +29,10 @@ export const postPhotosetsBulkReorder: Middleware<DefaultState, ContextWithMerge
     return
   }
 
-  const stream = new Transform()
+  // const stream = new PassThrough()
+  const stream = new Readable({
+    highWaterMark: 1,
+  })
   ctx.set({ 'X-Accel-Buffering': 'no' })
   ctx.body = stream
 
@@ -39,19 +42,19 @@ export const postPhotosetsBulkReorder: Middleware<DefaultState, ContextWithMerge
     try {
       const res = await reorderPhotoset(nsid, sId, orderBy, isDesc, token, secret)
       if (res.result.isSkipped) {
-        stream.write(`${sId}:k,`)
+        stream.push(`${sId}:k,`)
         return
       }
       if (res.result.isSuccessful) {
-        stream.write(`${sId}:s,`)
+        stream.push(`${sId}:s,`)
         return
       }
-      stream.write(`${sId}:f,`)
+      stream.push(`${sId}:f,`)
     } catch (e: unknown) {
-      stream.write(`${sId}:f,`)
+      stream.push(`${sId}:f,`)
     }
   }))
     .finally(() => {
-      stream.end()
+      stream.push(null)
     })
 }

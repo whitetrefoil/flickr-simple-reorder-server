@@ -1,6 +1,6 @@
-import got from 'got'
 import createHttpError from 'http-errors'
 import * as _ from 'lodash-es'
+import { client } from '../client.js'
 import type { IFlickrResponseObj } from '../format-api.js'
 import formatFlickrApi from '../format-api.js'
 import type { OAuthData } from './oauth.js'
@@ -18,16 +18,18 @@ export async function post<T extends OAuthData>(
       format        : 'json',
       nojsoncallback: '1',
     }),
+    key,
+    secret,
   }
 
-  const req = await got.post(requestData.url, {
+  const res = await client.post(requestData.url, {
     form        : authorize(requestData),
     responseType: 'json',
   })
 
-  if (!req.ok || _.get(req.body, 'stat') !== 'ok') {
-    throw createHttpError(req.statusCode, _.get(req.body, 'message'))
+  if (!res.ok || _.get(res.body, 'stat') !== 'ok') {
+    throw createHttpError(res.statusCode, _.get(res.body, 'message') ?? res.body ?? 'Unknown error')
   }
 
-  return formatFlickrApi(req.body as IFlickrResponseObj)
+  return formatFlickrApi(res.body as IFlickrResponseObj)
 }

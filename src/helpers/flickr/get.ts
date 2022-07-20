@@ -1,6 +1,6 @@
-import got from 'got'
 import createHttpError from 'http-errors'
 import * as _ from 'lodash-es'
+import { client } from '../client.js'
 import type { IFlickrResponseObj } from '../format-api.js'
 import formatFlickrApi from '../format-api.js'
 import type { OAuthData } from './oauth.js'
@@ -17,9 +17,11 @@ export async function get<T extends OAuthData>(method: string, data: T, key: str
       format        : 'json',
       nojsoncallback: '1',
     }),
+    key,
+    secret,
   }
 
-  const req = await got.get(requestData.url, {
+  const req = await client.get(requestData.url, {
     searchParams: authorize(requestData),
     responseType: 'json',
   })
